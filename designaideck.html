@@ -32,9 +32,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
-  overflow-x: hidden;
+  overflow: hidden;
+  height: 100vh;
 }
 
 body {
@@ -44,6 +43,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.9s var(--ease-smooth);
 }
 
 /* ─── FILM GRAIN OVERLAY ─── */
@@ -115,17 +115,25 @@ body::after {
 
 /* ─── SLIDES ─── */
 .slide {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
   width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  scroll-snap-align: start;
-  position: relative;
   padding: 80px 60px;
   overflow: hidden;
-  transition: background 0.8s var(--ease-smooth), color 0.8s var(--ease-smooth);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity, filter;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  z-index: 2;
 }
 
 .slide-inner {
@@ -827,8 +835,8 @@ body::after {
 /* ─── ANIMATIONS ─── */
 .slide-content {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s var(--ease-out) 0.1s, transform 0.7s var(--ease-out) 0.1s, filter 0.7s var(--ease-out) 0.1s;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out), filter 0.5s var(--ease-out);
   will-change: transform, opacity;
 }
 .slide.visible .slide-content {
@@ -836,11 +844,21 @@ body::after {
   transform: translateY(0);
 }
 
+/* During enter animations, the slide-level animation handles opacity/blur.
+   Content just does its transform — no double-opacity stacking. */
+.slide[class*="enter-"] .slide-content,
+.slide[class*="enter-"] .slide-content.anim-scale,
+.slide[class*="enter-"] .slide-content.anim-rtl,
+.slide[class*="enter-"] .slide-content.anim-fade {
+  opacity: 1;
+  filter: none;
+}
+
 /* Scale-in: for mega moments */
 .slide-content.anim-scale {
   opacity: 0;
-  transform: scale(0.88);
-  filter: blur(4px);
+  transform: scale(0.92);
+  filter: blur(3px);
 }
 .slide.visible .slide-content.anim-scale {
   opacity: 1;
@@ -851,7 +869,7 @@ body::after {
 /* Slide from right (RTL entrance) */
 .slide-content.anim-rtl {
   opacity: 0;
-  transform: translateX(60px);
+  transform: translateX(40px);
 }
 .slide.visible .slide-content.anim-rtl {
   opacity: 1;
@@ -862,7 +880,7 @@ body::after {
 .slide-content.anim-fade {
   opacity: 0;
   transform: none;
-  transition: opacity 1.2s var(--ease-smooth) 0.2s;
+  transition: opacity 0.7s var(--ease-smooth);
 }
 .slide.visible .slide-content.anim-fade {
   opacity: 1;
@@ -870,16 +888,16 @@ body::after {
 }
 
 /* Stagger children */
-.slide.visible .stagger > *:nth-child(1) { transition-delay: 0.05s; }
-.slide.visible .stagger > *:nth-child(2) { transition-delay: 0.15s; }
-.slide.visible .stagger > *:nth-child(3) { transition-delay: 0.25s; }
-.slide.visible .stagger > *:nth-child(4) { transition-delay: 0.35s; }
-.slide.visible .stagger > *:nth-child(5) { transition-delay: 0.45s; }
-.slide.visible .stagger > *:nth-child(6) { transition-delay: 0.55s; }
+.slide.visible .stagger > *:nth-child(1) { transition-delay: 0.04s; }
+.slide.visible .stagger > *:nth-child(2) { transition-delay: 0.10s; }
+.slide.visible .stagger > *:nth-child(3) { transition-delay: 0.18s; }
+.slide.visible .stagger > *:nth-child(4) { transition-delay: 0.26s; }
+.slide.visible .stagger > *:nth-child(5) { transition-delay: 0.34s; }
+.slide.visible .stagger > *:nth-child(6) { transition-delay: 0.42s; }
 .stagger > * {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  transform: translateY(14px);
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
 }
 .slide.visible .stagger > * {
   opacity: 1;
@@ -960,6 +978,166 @@ body::after {
   pointer-events: none;
   z-index: 1;
 }
+
+/* ─── CINEMATIC SLIDE TRANSITIONS ─── */
+
+/* FADE-BLUR: dreamy, elegant — the signature transition */
+.slide.leave-fade-blur {
+  animation: leaveFadeBlur 750ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-fade-blur {
+  animation: enterFadeBlur 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveFadeBlur {
+  0%   { opacity: 1; filter: blur(0); transform: scale(1); }
+  100% { opacity: 0; filter: blur(18px); transform: scale(0.96); }
+}
+@keyframes enterFadeBlur {
+  0%   { opacity: 0; filter: blur(18px); transform: scale(1.04); }
+  100% { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+/* ZOOM: dramatic, cinematic — for impact moments */
+.slide.leave-zoom {
+  animation: leaveZoom 700ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-zoom {
+  animation: enterZoom 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveZoom {
+  0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.35); filter: blur(6px); }
+}
+@keyframes enterZoom {
+  0%   { opacity: 0; transform: scale(0.7); filter: blur(6px); }
+  50%  { filter: blur(2px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+/* SLIDE-UP: energetic, forward motion */
+.slide.leave-slide-up {
+  animation: leaveSlideUp 650ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-slide-up {
+  animation: enterSlideUp 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveSlideUp {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10%); }
+}
+@keyframes enterSlideUp {
+  0%   { opacity: 0; transform: translateY(12%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* SLIDE-DOWN: reverse of slide-up, for going backward */
+.slide.leave-slide-down {
+  animation: leaveSlideDown 650ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-slide-down {
+  animation: enterSlideDown 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveSlideDown {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10%); }
+}
+@keyframes enterSlideDown {
+  0%   { opacity: 0; transform: translateY(-12%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* WIPE: clean reveal — for world changes (dark↔light) */
+.slide.leave-wipe {
+  animation: leaveWipeFade 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-wipe {
+  animation: enterWipe 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveWipeFade {
+  0%, 50% { opacity: 1; }
+  100%    { opacity: 0; }
+}
+@keyframes enterWipe {
+  0%   { clip-path: inset(0 0 0 100%); opacity: 1; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+/* WIPE REVERSE: for going backward across worlds */
+.slide.leave-wipe-rev {
+  animation: leaveWipeRevFade 900ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-wipe-rev {
+  animation: enterWipeRev 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveWipeRevFade {
+  0%, 50% { opacity: 1; }
+  100%    { opacity: 0; }
+}
+@keyframes enterWipeRev {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 1; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+/* SCALE-FADE: contemplative, quiet — for breath/pause slides */
+.slide.leave-scale-fade {
+  animation: leaveScaleFade 700ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-scale-fade {
+  animation: enterScaleFade 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveScaleFade {
+  0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(0.88); filter: blur(10px); }
+}
+@keyframes enterScaleFade {
+  0%   { opacity: 0; transform: scale(1.08); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* CURTAIN-UP: theatrical reveal — for big moments */
+.slide.leave-curtain {
+  animation: leaveCurtain 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2; pointer-events: none;
+}
+.slide.enter-curtain {
+  animation: enterCurtain 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3; pointer-events: none;
+}
+@keyframes leaveCurtain {
+  0%   { opacity: 1; clip-path: inset(0); }
+  100% { opacity: 1; clip-path: inset(0 0 100% 0); }
+}
+@keyframes enterCurtain {
+  0%   { opacity: 1; clip-path: inset(100% 0 0 0); }
+  100% { opacity: 1; clip-path: inset(0); }
+}
+
+/* Enhanced stagger timing for post-transition content entry */
+.slide.active .stagger > * {
+  transition-duration: 0.6s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide.active.visible .stagger > *:nth-child(1) { transition-delay: 0.08s; }
+.slide.active.visible .stagger > *:nth-child(2) { transition-delay: 0.16s; }
+.slide.active.visible .stagger > *:nth-child(3) { transition-delay: 0.26s; }
+.slide.active.visible .stagger > *:nth-child(4) { transition-delay: 0.36s; }
+.slide.active.visible .stagger > *:nth-child(5) { transition-delay: 0.48s; }
+.slide.active.visible .stagger > *:nth-child(6) { transition-delay: 0.60s; }
 
 /* ─── DECORATIVE ELEMENTS ─── */
 .deco-orb {
@@ -1070,7 +1248,7 @@ body::after {
   font-style: normal;
 }
 .presenter-panel-body br + br { display: block; content: ''; margin-top: 8px; }
-body.presenter-mode .slide { min-height: 62vh; }
+body.presenter-mode .slide { height: 62vh; bottom: auto; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
@@ -1174,7 +1352,7 @@ body.blacked-out::after {
 <!-- 6 - Flow -->
 <section class="slide" data-world="dark" id="s6">
   <div class="slide-inner slide-content anim-scale full-center">
-    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(6rem,22vw,18rem);line-height:0.85;">יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו,
+    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(3.5rem,10vw,9rem);line-height:0.9;">יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו,
       .</div>
   </div>
 
@@ -1389,6 +1567,7 @@ body.blacked-out::after {
 <!-- 17b - Breath -->
 <section class="slide" data-world="void" id="s17b">
   <div class="slide-inner slide-content full-center">
+    <div class="t-medium" style="max-width:700px;opacity:0.5;font-style:italic;">בשלב מסוים התחלתי לעבוד בצורה קצת אחרת עם AI...</div>
   </div>
 
   <aside class="notes"><em>פאוזה של 4 שניות. לא למלא אותה.</em></aside>
@@ -1405,7 +1584,7 @@ body.blacked-out::after {
   <!-- Subtle secondary warm ring -->
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120vw;height:120vh;background:radial-gradient(ellipse 50% 40% at center,rgba(255,155,102,0.04) 0%,transparent 60%);pointer-events:none;z-index:0;"></div>
   <div class="slide-inner slide-content anim-scale full-center" style="position:relative;z-index:2;">
-    <!-- Struck-through text — above, faded, ghostly -->
+    <!-- Struck-through text - above, faded, ghostly -->
     <div style="font-family:var(--font-display);font-size:clamp(1.6rem,4.5vw,3.2rem);font-weight:700;letter-spacing:0.04em;color:rgba(255,255,255,0.2);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(255,255,255,0.25);margin-bottom:20px;">לא מייצרת.</div>
     <!-- Hero word -->
     <div style="position:relative;font-family:var(--font-display);font-size:clamp(6rem,20vw,18rem);font-weight:900;line-height:0.85;letter-spacing:-0.04em;color:var(--coral);text-shadow:0 0 80px rgba(255,107,53,0.3),0 0 160px rgba(255,107,53,0.1);">יוצרת.</div>
@@ -1540,7 +1719,7 @@ body.blacked-out::after {
     </ol>
   </div>
 
-  <aside class="notes">"מעצבים שהוציאו תוצרים מעולים מ-AI — לא כאלה שנראים מרשימים, כאלה שאנשים באמת רוצים להשתמש בהם — הבינו שלושה דברים.<br><br>שלושה דברים שהמחקר מאשש, ושה-AI פשוט לא יכול לעשות לבד."<br><br><em>פאוזה.</em><br><br>"ולמה דווקא עכשיו — הם יותר נחוצים מתמיד."</aside>
+  <aside class="notes">"מעצבים שהוציאו תוצרים מעולים מ-AI - לא כאלה שנראים מרשימים, כאלה שאנשים באמת רוצים להשתמש בהם - הבינו שלושה דברים.<br><br>שלושה דברים שהמחקר מאשש, ושה-AI פשוט לא יכול לעשות לבד."<br><br><em>פאוזה.</em><br><br>"ולמה דווקא עכשיו - הם יותר נחוצים מתמיד."</aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1556,17 +1735,17 @@ body.blacked-out::after {
       <defs>
         <filter id="nodeGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <g class="dmn-edges" stroke="var(--coral)" stroke-width="1" opacity="0.25">
-        <line x1="90" y1="80" x2="220" y2="140"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="3s" repeatCount="indefinite"/></line>
-        <line x1="220" y1="140" x2="380" y2="100"><animate attributeName="opacity" values="0.15;0.45;0.15" dur="3.5s" repeatCount="indefinite" begin="0.3s"/></line>
-        <line x1="380" y1="100" x2="510" y2="160"><animate attributeName="opacity" values="0.1;0.35;0.1" dur="2.8s" repeatCount="indefinite" begin="0.6s"/></line>
-        <line x1="90" y1="80" x2="160" y2="220"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="4s" repeatCount="indefinite" begin="0.2s"/></line>
-        <line x1="160" y1="220" x2="300" y2="240"><animate attributeName="opacity" values="0.15;0.4;0.15" dur="3.2s" repeatCount="indefinite" begin="0.5s"/></line>
-        <line x1="300" y1="240" x2="440" y2="200"><animate attributeName="opacity" values="0.1;0.35;0.1" dur="3.8s" repeatCount="indefinite" begin="0.8s"/></line>
-        <line x1="440" y1="200" x2="510" y2="160"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="2.5s" repeatCount="indefinite" begin="1s"/></line>
-        <line x1="220" y1="140" x2="300" y2="240"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="3.6s" repeatCount="indefinite" begin="0.4s"/></line>
-        <line x1="380" y1="100" x2="440" y2="200"><animate attributeName="opacity" values="0.15;0.4;0.15" dur="3s" repeatCount="indefinite" begin="0.7s"/></line>
-        <line x1="160" y1="220" x2="380" y2="100"><animate attributeName="opacity" values="0.1;0.25;0.1" dur="4.5s" repeatCount="indefinite" begin="1.2s"/></line>
+      <g class="dmn-edges" stroke="var(--light-text)" stroke-width="1.5" opacity="0.5">
+        <line x1="90" y1="80" x2="220" y2="140"><animate attributeName="opacity" values="0.25;0.7;0.25" dur="3s" repeatCount="indefinite"/></line>
+        <line x1="220" y1="140" x2="380" y2="100"><animate attributeName="opacity" values="0.3;0.75;0.3" dur="3.5s" repeatCount="indefinite" begin="0.3s"/></line>
+        <line x1="380" y1="100" x2="510" y2="160"><animate attributeName="opacity" values="0.25;0.65;0.25" dur="2.8s" repeatCount="indefinite" begin="0.6s"/></line>
+        <line x1="90" y1="80" x2="160" y2="220"><animate attributeName="opacity" values="0.25;0.6;0.25" dur="4s" repeatCount="indefinite" begin="0.2s"/></line>
+        <line x1="160" y1="220" x2="300" y2="240"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="3.2s" repeatCount="indefinite" begin="0.5s"/></line>
+        <line x1="300" y1="240" x2="440" y2="200"><animate attributeName="opacity" values="0.25;0.65;0.25" dur="3.8s" repeatCount="indefinite" begin="0.8s"/></line>
+        <line x1="440" y1="200" x2="510" y2="160"><animate attributeName="opacity" values="0.25;0.6;0.25" dur="2.5s" repeatCount="indefinite" begin="1s"/></line>
+        <line x1="220" y1="140" x2="300" y2="240"><animate attributeName="opacity" values="0.25;0.6;0.25" dur="3.6s" repeatCount="indefinite" begin="0.4s"/></line>
+        <line x1="380" y1="100" x2="440" y2="200"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite" begin="0.7s"/></line>
+        <line x1="160" y1="220" x2="380" y2="100"><animate attributeName="opacity" values="0.2;0.55;0.2" dur="4.5s" repeatCount="indefinite" begin="1.2s"/></line>
       </g>
       <g filter="url(#nodeGlow)">
         <circle cx="90" cy="80" r="10" fill="var(--coral)" opacity="0.7"><animate attributeName="r" values="8;12;8" dur="3s" repeatCount="indefinite"/></circle>
@@ -1577,13 +1756,13 @@ body.blacked-out::after {
         <circle cx="300" cy="240" r="13" fill="var(--coral)" opacity="0.9"><animate attributeName="r" values="11;15;11" dur="2.4s" repeatCount="indefinite" begin="0.5s"/></circle>
         <circle cx="440" cy="200" r="10" fill="var(--coral)" opacity="0.7"><animate attributeName="r" values="8;12;8" dur="3.1s" repeatCount="indefinite" begin="0.8s"/></circle>
       </g>
-      <text x="90" y="54" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">זיכרון</text>
-      <text x="220" y="114" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">רגש</text>
-      <text x="380" y="74" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">חלום</text>
-      <text x="510" y="134" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">תובנה</text>
-      <text x="160" y="256" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">גוף</text>
-      <text x="300" y="276" text-anchor="middle" fill="var(--coral)" font-size="26" font-weight="700" opacity="0.85">DMN</text>
-      <text x="440" y="232" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="600" opacity="0.55">אינטואיציה</text>
+      <text x="90" y="54" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">זיכרון</text>
+      <text x="220" y="114" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">רגש</text>
+      <text x="380" y="74" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">חלום</text>
+      <text x="510" y="134" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">תובנה</text>
+      <text x="160" y="256" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">גוף</text>
+      <text x="300" y="276" text-anchor="middle" fill="var(--coral)" font-size="26" font-weight="700" opacity="1">DMN</text>
+      <text x="440" y="232" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">אינטואיציה</text>
     </svg>
   </div>
 
@@ -1657,14 +1836,24 @@ body.blacked-out::after {
   <div class="slide-inner slide-content full-center">
     <div class="recipe-card">
       <div class="section-badge">טיפ פרקטי</div>
-      <div class="t-large" style="margin-bottom:32px;color:#fff;">לפני הפרומפט הראשון -<br>תנו למחשבות לנדוד.</div>
-      <ol class="fragment-list" style="max-width:700px;">
-        <li><span class="num">•</span>תחכו רגע עם הפרומפט - לא לתת לקול המודל להסית</li>
-        <li><span class="num">•</span>5 דק׳ אחרי ראיון - לכתוב מה עלה, לאן לקח</li>
-        <li><span class="num">•</span>ברייק 10 דק׳ + A4 + קשקוש</li>
-        <li><span class="num">•</span>רק אחר כך → פתחו כלי</li>
-        <li><span class="num">•</span>תנו לו 3 בולטים ייחודיים לכם</li>
-      </ol>
+      <div class="t-large" style="margin-bottom:40px;color:#fff;">לפני הפרומפט הראשון -<br>תנו למחשבות לנדוד.</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;width:100%;max-width:760px;">
+        <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:2.2rem;font-weight:900;color:var(--coral);line-height:1;margin-bottom:12px;">1</div>
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">חכו</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">תחכו רגע עם הפרומפט.<br>תנו לעצמכם לחשוב קודם.</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:2.2rem;font-weight:900;color:var(--coral);line-height:1;margin-bottom:12px;">2</div>
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">נדדו</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">5 דק׳ אחרי ראיון - כתבו.<br>10 דק׳ ברייק - דף A4 וקשקוש.</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:2.2rem;font-weight:900;color:var(--coral);line-height:1;margin-bottom:12px;">3</div>
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">פתחו כלי</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">ותנו לו 3 בולטים<br><span style="color:var(--coral);">ייחודיים לכם.</span></div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="qr-placeholder">QR</div>
@@ -1746,7 +1935,6 @@ body.blacked-out::after {
 <section class="slide" data-world="light" id="s35">
   <div class="deco-orb coral-tl" style="opacity:0.7;"></div>
   <div class="slide-inner slide-content anim-scale full-center" style="position:relative;">
-    <span style="position:absolute;top:8%;right:8%;font-family:var(--font-display);font-size:clamp(12rem,28vw,28rem);font-weight:100;line-height:0.6;opacity:0.06;color:var(--light-text);pointer-events:none;user-select:none;">״</span>
     <div style="font-family:var(--font-display);font-size:clamp(2.6rem,7vw,6rem);font-weight:900;line-height:1.15;text-align:center;max-width:1000px;letter-spacing:-0.01em;position:relative;z-index:2;">
       אנחנו יודעים יותר<br>ממה שאנחנו<br><span class="coral">יכולים להגיד.</span>
     </div>
@@ -1773,7 +1961,16 @@ body.blacked-out::after {
     <div class="t-huge">אתם<br><span class="coral">מומחי ידע סמוי.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה. חיוך קטן של הכרה.</em><br><br>"כל הנוכחים פה יודעים את זה בבטן.<br><br>הסופר פאוור של רוב המעצבים שהכרתי זה כמה חזקים הם בלהרגיש את מה שלא נאמר.<br><br>אתם מומחי ידע סמוי.<br><br>הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם - ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br>והידע הזה הוא הדבר הכי יקר שיש לכם."</aside>
+  <aside class="notes"><em>פאוזה. חיוך קטן של הכרה.</em><br><br>"כל הנוכחים פה יודעים את זה בבטן.<br><br>הסופר פאוור של רוב המעצבים שהכרתי זה כמה חזקים הם בלהרגיש את מה שלא נאמר.<br><br>אתם מומחי ידע סמוי.</aside>
+</section>
+
+<!-- 37b - Tacit knowledge body -->
+<section class="slide" data-world="light" id="s37b">
+  <div class="slide-inner slide-content full-center">
+    <div class="t-medium" style="max-width:700px;line-height:1.7;text-align:center;">הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם -<br><br>ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br><span class="coral" style="font-weight:700;">והידע הזה הוא הדבר הכי יקר שיש לכם.</span></div>
+  </div>
+
+  <aside class="notes">"הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם - ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br>והידע הזה הוא הדבר הכי יקר שיש לכם."</aside>
 </section>
 
 <!-- 38 - Body vs words -->
@@ -1790,20 +1987,26 @@ body.blacked-out::after {
   <div class="slide-inner slide-content full-center">
     <div class="recipe-card">
       <div class="section-badge">טיפ פרקטי</div>
-      <div class="chat-bubble" style="margin-bottom:32px;border-radius:16px;">
-        ״אני יודע/ת שזה לא עובד, אבל לא יודע/ת למה.״
+      <div class="t-large" style="margin-bottom:40px;color:#fff;">השתמשו באינטואיציה שלכם.</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;width:100%;max-width:760px;">
+        <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">סמנו</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">רגעים שבהם<br><span style="color:rgba(255,255,255,0.8);">״אני יודע/ת שזה לא עובד,<br>אבל לא יודע/ת למה.״</span></div>
+        </div>
+        <div style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">הישארו בחדר</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">אלה הרגעים שלכם.<br>שהו בבעיה.</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:16px;padding:28px 24px;">
+          <div style="font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:#fff;margin-bottom:8px;">תחליטו</div>
+          <div style="font-size:clamp(0.85rem,1.3vw,1rem);color:rgba(255,255,255,0.5);line-height:1.5;">AI יבצע -<br><span style="color:var(--coral);">אחרי שתחליטו.</span></div>
+        </div>
       </div>
-      <ol class="fragment-list" style="max-width:700px;">
-        <li><span class="num">→</span><strong>השתמשו באינטואיציה שלכם.</strong></li>
-        <li><span class="num">→</span>אלה הרגעים שאתם חייבים להישאר בחדר.</li>
-        <li><span class="num">→</span><strong>זה הזמן שלכם לשהות בבעיה.</strong></li>
-        <li><span class="num">→</span>AI יבצע - אחרי שתחליטו.</li>
-      </ol>
     </div>
   </div>
   <div class="qr-placeholder">QR</div>
 
-  <aside class="notes">הטיפ: השתמשו באינטואיציה שלכם.<br><br>תסמנו רגעים שבהם 'אני יודע שזה לא עובד, אבל לא יודע למה'.<br><br>אלה הרגעים שאתם חייבים להישאר בחדר. AI יבצע - אחרי שתחליטו.</aside>
+  <aside class="notes">"הטיפ הפרקטי — השתמשו באינטואיציה שלכם.<br><br>תסמנו בתוך העבודה שלכם רגעים שבהם 'אני יודע שזה לא עובד, אבל לא יודע להגיד למה'.<br><br>אלה הרגעים שבהם אתם חייבים להישאר בחדר. זה הזמן שלכם לשהות בבעיה.<br><br>ו-AI יעזור לבצע אחרי שאתם תחליטו."</aside>
 </section>
 
 <!-- 39b - VP Design -->
@@ -1814,7 +2017,7 @@ body.blacked-out::after {
     <div class="t-huge" style="margin-top:40px;color:rgba(255,255,255,0.5);font-weight:300;">ו-AI הוא הג׳וניור.</div>
   </div>
 
-  <aside class="notes">"מזל טוב, קודמתם להיות VP Design.<br><br>ו-AI? הוא הג׳וניור שלכם.<br><br>הוא מהיר, הוא חרוץ, הוא לא ישן.<br><br>אבל הוא לא יודע מה נכון — עד שאתם תגידו לו."</aside>
+  <aside class="notes">"מזל טוב, קודמתם להיות VP Design.<br><br>ו-AI? הוא הג׳וניור שלכם.<br><br>הוא מהיר, הוא חרוץ, הוא לא ישן.<br><br>אבל הוא לא יודע מה נכון - עד שאתם תגידו לו."</aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1826,7 +2029,7 @@ body.blacked-out::after {
   <div class="slide-inner slide-content pin-left">
     <div class="section-badge">עיקרון 3</div>
     <div class="t-large" style="max-width:700px;">שני הדברים הראשונים תמיד היו שם.</div>
-    <div class="t-body muted mt-sm">מה שהשתנה — הכלי שמחבר ביניהם.</div>
+    <div class="t-body muted mt-sm">מה שהשתנה - הכלי שמחבר ביניהם.</div>
   </div>
 
   <aside class="notes"><em>אנרגיה יותר אופרטיבית, קלה. זו העיקרון שמחברת הכל.</em><br><br>"עכשיו שתי העקרונות הראשונות - הילדה שבכם שמייצרת חדשנות, והגוף שלכם שקורא אנשים - תמיד היו שם.<br><br>זה לא חדש.<br><br>זה מה שהופך אתכם ל-designers טובים.<br><br>אבל -"</aside>
@@ -1861,7 +2064,7 @@ body.blacked-out::after {
 
 <!-- 42 - Until now -->
 <section class="slide" data-world="dark" id="s42" style="background:#0a0908;overflow:hidden;">
-  <!-- Warm horizon glow at the bottom — dawn is coming -->
+  <!-- Warm horizon glow at the bottom - dawn is coming -->
   <div style="position:absolute;bottom:0;left:0;right:0;height:35vh;background:linear-gradient(to top,rgba(255,107,53,0.06) 0%,rgba(255,107,53,0.02) 40%,transparent 100%);pointer-events:none;z-index:0;"></div>
   <!-- Faint radial warmth behind text -->
   <div style="position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);width:60vw;height:40vh;background:radial-gradient(ellipse at center,rgba(255,155,102,0.05) 0%,transparent 65%);pointer-events:none;z-index:0;"></div>
@@ -1988,7 +2191,7 @@ body.blacked-out::after {
   <div class="slide-inner slide-content full-center">
     <div class="recipe-card">
       <div class="section-badge">טיפ פרקטי</div>
-      <div class="t-large" style="margin-bottom:32px;color:#fff;">כלי אחד. חברו הכל. תנו לו לעבוד.</div>
+      <div class="t-large" style="margin-bottom:32px;color:#fff;">כלי אחד. חברו הכל. ותכנסו לפלואו.</div>
       <ol class="fragment-list stagger" style="max-width:700px;">
         <li><span class="num">1</span>בחרו כלי אחד בלבד.</li>
         <li><span class="num">2</span>חברו אליו עיניים, זיכרון, וידיים.</li>
@@ -2025,6 +2228,15 @@ body.blacked-out::after {
   </div>
 
   <aside class="notes"><em>פאוזה.</em><br><br>"זה סשן של קראפט.<br><br>של יצירה.<br><br>הילדה שבי שיחקה בין השלבים - בדיוק כמו שבגיל 11 שיחקה בין HTML לצבעים.<br><br>הגוף שלי, האינטואיציה שלי על היוזר שלי - הם שהחליטו אילו שאלות לשאול ואיזה פתרון כדאי לבדוק.<br><br>ו-Cursor? הוא היה פשוט המקום שאפשר לכל זה לקרות."</aside>
+</section>
+
+<!-- 59 - New craft -->
+<section class="slide" data-world="light" id="s59">
+  <div class="slide-inner slide-content pin-left">
+    <div class="t-huge" style="max-width:700px;">הקראפט החדש.<br>אותה נשמה. <span class="coral">form אחר.</span></div>
+  </div>
+
+  <aside class="notes"><em>אנרגיה מתכנסת. חמה. מזמינה.</em><br><br>"אני מכוונת את הספינה.<br><br>אבל אם פעם הייתי נתקעת כי הייתי תלויה בכישורים של אחרים - היום גם כשאני נתקעת, זו הזדמנות ללמוד ולפתח כישור.<br><br>אם פעם משהו אופרטיבי היה שואב לי את רוב היום - היום האייג'נט שלי מתקתק את זה ברקע.<br><br>דרך העבודה שלי נהייתה היצירה עצמה. דרך העבודה, הספונטניות - החזיר את הילדה שבי. את האינטואיציה שלי. המשחקיות.<br><br>זה הקראפט החדש.<br><br>פשוט ב-form שאנחנו עוד לא רגילים אליו."</aside>
 </section>
 
 <!-- 51 - Idea to execution -->
@@ -2065,15 +2277,6 @@ body.blacked-out::after {
 <!-- ═══════════════════════════════════════════ -->
 <!-- STATION 6 - CLOSING -->
 <!-- ═══════════════════════════════════════════ -->
-
-<!-- 59 - New craft -->
-<section class="slide" data-world="light" id="s59">
-  <div class="slide-inner slide-content pin-left">
-    <div class="t-huge" style="max-width:700px;">הקראפט החדש.<br>אותה נשמה. <span class="coral">form אחר.</span></div>
-  </div>
-
-  <aside class="notes"><em>אנרגיה מתכנסת. חמה. מזמינה.</em><br><br>"אני מכוונת את הספינה.<br><br>אבל אם פעם הייתי נתקעת כי הייתי תלויה בכישורים של אחרים - היום גם כשאני נתקעת, זו הזדמנות ללמוד ולפתח כישור.<br><br>אם פעם משהו אופרטיבי היה שואב לי את רוב היום - היום האייג'נט שלי מתקתק את זה ברקע.<br><br>דרך העבודה שלי נהייתה היצירה עצמה. דרך העבודה, הספונטניות - החזיר את הילדה שבי. את האינטואיציה שלי. המשחקיות.<br><br>זה הקראפט החדש.<br><br>פשוט ב-form שאנחנו עוד לא רגילים אליו."</aside>
-</section>
 
 <!-- 60 - Permission -->
 <section class="slide" data-world="coral" id="s60" style="overflow:hidden;background:linear-gradient(135deg, #E8522A 0%, #FF6B35 50%, #FF8F5E 100%);">
@@ -2140,10 +2343,18 @@ const navHint = document.getElementById('navHint');
 const presenterPanel = document.getElementById('presenterPanel');
 const noteContent = document.getElementById('noteContent');
 const noteSlideNum = document.getElementById('noteSlideNum');
+
 let currentSlide = 0;
 let hintHidden = false;
 let notesOpen = false;
-let isScrolling = false;
+let isTransitioning = false;
+
+const TRANSITION_MS = 900;
+
+const WORLD_BG = {
+  'dark': '#0a0908', 'light': '#FAF8F5', 'light-warm': '#FBF5EE',
+  'light-cool': '#F5F6FA', 'coral': '#FF6B35', 'void': '#000000', 'shift': '#0a0908'
+};
 
 const params = new URLSearchParams(window.location.search);
 const presenterMode = params.has('presenter');
@@ -2152,13 +2363,87 @@ if (!presenterMode) {
   document.querySelector('.progress').style.display = 'none';
 }
 
+function isLightWorld(w) { return w && (w.startsWith('light') || w === 'coral' || w === 'shift'); }
+function isDarkWorld(w) { return w === 'dark' || w === 'void'; }
+
+function pickTransition(fromIdx, toIdx) {
+  const from = slides[fromIdx];
+  const to = slides[toIdx];
+  const fw = from ? from.dataset.world : null;
+  const tw = to ? to.dataset.world : null;
+  const fwd = toIdx > fromIdx;
+
+  if (fw && tw && fw !== tw) {
+    if ((isLightWorld(fw) && isDarkWorld(tw)) || (isDarkWorld(fw) && isLightWorld(tw))) {
+      return fwd ? 'wipe' : 'wipe-rev';
+    }
+    if (tw === 'coral') return 'curtain';
+    if (fw === 'coral') return fwd ? 'curtain' : 'fade-blur';
+  }
+
+  if (tw === 'void') return 'scale-fade';
+
+  const hasViewport = to.querySelector('.t-viewport');
+  const hasMega = to.querySelector('.t-mega');
+  if (hasViewport || hasMega) return 'zoom';
+
+  const hasHand = to.querySelector('.t-hand');
+  if (hasHand) return 'zoom';
+
+  const hasList = to.querySelector('.fragment-list') || to.querySelector('.table-simple');
+  if (hasList) return fwd ? 'slide-up' : 'slide-down';
+
+  const hasRecipe = to.querySelector('.recipe-card');
+  if (hasRecipe) return 'curtain';
+
+  const cycle = ['fade-blur', 'slide-up', 'fade-blur', 'scale-fade'];
+  return cycle[toIdx % cycle.length];
+}
+
+function cleanAnim(el) {
+  el.classList.forEach(c => { if (c.startsWith('enter-') || c.startsWith('leave-')) el.classList.remove(c); });
+}
+
 function goToSlide(index) {
-  if (index < 0 || index >= slides.length) return;
-  if (isScrolling) return;
-  isScrolling = true;
+  if (index < 0 || index >= slides.length || index === currentSlide || isTransitioning) return;
+  isTransitioning = true;
+
+  const fwd = index > currentSlide;
+  let transition = pickTransition(currentSlide, index);
+
+  if (!fwd && transition === 'slide-up') transition = 'slide-down';
+  if (!fwd && transition === 'wipe') transition = 'wipe-rev';
+
+  const leaving = slides[currentSlide];
+  const entering = slides[index];
+
+  cleanAnim(leaving);
+  cleanAnim(entering);
+
+  leaving.classList.remove('visible');
+  leaving.classList.add('leave-' + transition);
+
+  entering.classList.add('enter-' + transition);
+
   currentSlide = index;
-  slides[index].scrollIntoView({ behavior: 'smooth' });
-  setTimeout(() => { isScrolling = false; }, 400);
+  updateUI();
+
+  const world = entering.dataset.world;
+  document.body.style.backgroundColor = WORLD_BG[world] || '#0a0908';
+
+  setTimeout(() => {
+    entering.classList.add('visible');
+  }, 250);
+
+  setTimeout(() => {
+    leaving.classList.remove('active');
+    cleanAnim(leaving);
+
+    entering.classList.add('active');
+    cleanAnim(entering);
+
+    isTransitioning = false;
+  }, TRANSITION_MS);
 }
 
 document.addEventListener('click', () => { document.body.focus(); });
@@ -2178,6 +2463,10 @@ function updateUI() {
   const notesEl = slides[currentSlide].querySelector('.notes');
   noteContent.innerHTML = notesEl ? notesEl.innerHTML : '<em>אין הערות לסלייד הזה</em>';
   noteSlideNum.textContent = slides[currentSlide].id || ('slide ' + (currentSlide + 1));
+
+  if (slides[currentSlide].id) {
+    history.replaceState(null, '', '#' + slides[currentSlide].id);
+  }
 }
 
 const NEXT_KEYS = new Set(['ArrowDown', ' ', 'PageDown', 'ArrowRight', 'Enter']);
@@ -2199,20 +2488,13 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     goToSlide(slides.length - 1);
   } else if (e.key === 'Escape') {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    }
+    if (document.fullscreenElement) document.exitFullscreen();
   } else if (e.key === 'F5') {
     e.preventDefault();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
   } else if (e.key === 'f' || e.key === 'F') {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
   } else if (e.key === 'b' || e.key === 'B' || e.key === '.') {
     e.preventDefault();
     document.body.classList.toggle('blacked-out');
@@ -2230,20 +2512,59 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const index = Array.from(slides).indexOf(entry.target);
-      currentSlide = index;
-      updateUI();
-      entry.target.classList.add('visible');
+let wheelAccum = 0;
+let wheelTimer = null;
+document.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  wheelAccum += e.deltaY;
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(() => {
+    if (Math.abs(wheelAccum) > 30) {
+      if (wheelAccum > 0) goToSlide(currentSlide + 1);
+      else goToSlide(currentSlide - 1);
+    }
+    wheelAccum = 0;
+  }, 80);
+}, { passive: false });
+
+let touchStartY = 0;
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.addEventListener('touchend', (e) => {
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+    if (dy > 0) goToSlide(currentSlide + 1);
+    else goToSlide(currentSlide - 1);
+  }
+}, { passive: true });
+
+function initSlides() {
+  let startIdx = 0;
+  const hash = window.location.hash;
+  if (hash) {
+    const target = document.querySelector(hash);
+    if (target) {
+      const idx = Array.from(slides).indexOf(target);
+      if (idx >= 0) startIdx = idx;
+    }
+  }
+
+  slides.forEach((s, i) => {
+    if (i === startIdx) {
+      s.classList.add('active', 'visible');
     }
   });
-}, { threshold: 0.3 });
 
-slides.forEach(slide => observer.observe(slide));
-slides[0].classList.add('visible');
-updateUI();
+  currentSlide = startIdx;
+  document.body.style.backgroundColor = WORLD_BG[slides[startIdx].dataset.world] || '#0a0908';
+  updateUI();
+}
+
+initSlides();
 </script>
 
 </body>
