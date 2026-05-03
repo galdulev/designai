@@ -1123,14 +1123,10 @@ body.blacked-out::after {
 <!-- 1 - Video -->
 <section class="slide" data-world="void" id="s1">
   <div class="slide-inner slide-content full-center">
-    <div style="width:100%;max-width:860px;aspect-ratio:16/9;background:linear-gradient(145deg, #0d0d0f, #111114);border-radius:20px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.06);box-shadow:0 16px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);position:relative;overflow:hidden;">
-      <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%, rgba(255,107,53,0.04) 0%, transparent 60%);"></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;z-index:2;">
-        <div style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-          <span style="font-size:24px;margin-left:-2px;opacity:0.6;">▶</span>
-        </div>
-        <span style="font-size:clamp(0.8rem,1.5vw,1.1rem);opacity:0.25;letter-spacing:0.05em;">סרטון פתיחה - 2 דקות</span>
-      </div>
+    <div style="width:100%;max-width:860px;border-radius:20px;overflow:hidden;box-shadow:0 16px 60px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.06);background:#000;">
+      <video style="width:100%;display:block;" controls playsinline>
+        <source src="videos/Demo video - v04 - audio.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 
@@ -1178,7 +1174,8 @@ body.blacked-out::after {
 <!-- 6 - Flow -->
 <section class="slide" data-world="dark" id="s6">
   <div class="slide-inner slide-content anim-scale full-center">
-    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(6rem,22vw,18rem);line-height:0.85;">פלואו.</div>
+    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(6rem,22vw,18rem);line-height:0.85;">יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו,
+      .</div>
   </div>
 
   <aside class="notes">"זו העיקרון שחלקנו בחדר הזה. לא?<br><br>בגלל שמתישהו - בגיל 11, בגיל 17, בגיל 28 - הרגשנו את ההרגשה הזו.<br><br>נאבדנו בתוך הקראפט.<br><br>יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו, והתעוררנו ממנו אחרי שעות עם משהו שמרגיש כמו יצירת אומנות."<br><br><em>פאוזה. שתי שניות מלאות.</em></aside>
@@ -2011,12 +2008,10 @@ body.blacked-out::after {
 <!-- 48 - Video BG -->
 <section class="slide" data-world="void" id="s48">
   <div class="slide-inner slide-content anim-fade full-center">
-    <div style="width:100%;max-width:760px;aspect-ratio:16/9;background:linear-gradient(145deg, #0d0d0f, #111114);border-radius:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 48px rgba(0,0,0,0.4);position:relative;overflow:hidden;">
-      <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%, rgba(255,107,53,0.03) 0%, transparent 60%);"></div>
-      <div style="display:flex;align-items:center;gap:12px;opacity:0.2;position:relative;z-index:2;">
-        <span style="font-size:16px;">▶</span>
-        <span style="font-size:clamp(0.75rem,1.3vw,1rem);letter-spacing:0.05em;">הסרטון רץ ברקע</span>
-      </div>
+    <div style="width:100%;max-width:760px;border-radius:18px;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.04);background:#000;">
+      <video style="width:100%;display:block;" autoplay loop muted playsinline>
+        <source src="videos/Demo video - no sound.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 
@@ -2035,6 +2030,9 @@ body.blacked-out::after {
 <!-- 51 - Idea to execution -->
 <section class="slide" data-world="dark" id="s51">
   <div class="slide-inner slide-content full-center gap-md">
+    <div style="max-width:520px;border-radius:14px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);">
+      <img src="videos/wireframes-fade.gif" alt="" style="width:100%;display:block;">
+    </div>
     <div class="t-large" style="max-width:600px;">הפער בין רעיון לביצוע <span class="coral">נמחק.</span></div>
     <div class="t-medium muted" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;">
       ציור <span style="color:var(--coral);">←</span> Cursor <span style="color:var(--coral);">←</span> <span class="s51-cycle" style="display:inline-block;position:relative;min-width:280px;"><span class="s51-word coral" style="font-weight:700;">אנימציה</span><span class="s51-word coral" style="font-weight:700;">קוד שמיש וסקיילבילי</span><span class="s51-word coral" style="font-weight:700;font-style:italic;">כל דבר שרק תרצו</span></span>
@@ -2062,37 +2060,6 @@ body.blacked-out::after {
 
   <aside class="notes"><em>פאוזה.</em><br><br>"שם -"<br><br><em>מצביעה.</em><br><br>"אני מעבירה את הציור ל-Cursor.<br><br>והוא הופך אותו לעיצוב מלא, לפי מערכת העיצוב שלנו.<br><br>זה הרגע שהפער בין רעיון לביצוע נמחק.<br><br>פעם הציור הזה היה מת בדף.<br><br>היום - הוא הופך לעיצוב באותו היום."</aside>
 </section>
-
-<!-- 53 - Vibe-work -->
-<section class="slide" data-world="dark" id="s53">
-  <div class="deco-orb coral-tl" style="top:10%;left:20%;opacity:0.8;"></div>
-  <div class="deco-orb gold-sm" style="bottom:15%;right:15%;"></div>
-  <div class="slide-inner slide-content anim-scale full-center">
-    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(4.5rem,16vw,14rem);line-height:0.85;"><span class="s53-cycle" style="display:inline-block;position:relative;min-width:100%;"><span class="s53-word">וייב קודינג.</span><span class="s53-word">וייב ריסרצ׳.</span><span class="s53-word">וייב הכל.</span></span></div>
-    <style>
-      .s53-cycle { height: 1.2em; overflow: hidden; }
-      .s53-word {
-        display: block;
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transform: translateY(40%);
-        animation: s53-rotate 6s ease-in-out infinite;
-      }
-      .s53-word:nth-child(1) { animation-delay: 0s; }
-      .s53-word:nth-child(2) { animation-delay: 2s; }
-      .s53-word:nth-child(3) { animation-delay: 4s; }
-      @keyframes s53-rotate {
-        0%        { opacity: 0; transform: translateY(40%); }
-        8%, 30%   { opacity: 1; transform: translateY(0); }
-        38%, 100% { opacity: 0; transform: translateY(-40%); }
-      }
-    </style>
-  </div>
-
-  <aside class="notes"><em>פאוזה. עצמת הטיעון עולה.</em><br><br>"זה וייב קודינג.<br><br>וייב ריסרצ׳.<br><br>וייב הכל.<br><br>ספונטני. רציף. משתנה. משחקי.<br><br>זו הפעם הראשונה ב-9 שנים שיכולתי לעבוד ככה."<br><br><em>פאוזה ארוכה.</em></aside>
-</section>
-
 
 
 <!-- ═══════════════════════════════════════════ -->
@@ -2177,6 +2144,13 @@ let currentSlide = 0;
 let hintHidden = false;
 let notesOpen = false;
 let isScrolling = false;
+
+const params = new URLSearchParams(window.location.search);
+const presenterMode = params.has('presenter');
+if (!presenterMode) {
+  counter.style.display = 'none';
+  document.querySelector('.progress').style.display = 'none';
+}
 
 function goToSlide(index) {
   if (index < 0 || index >= slides.length) return;
