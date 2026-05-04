@@ -1250,6 +1250,100 @@ body::after {
 .presenter-panel-body br + br { display: block; content: ''; margin-top: 8px; }
 body.presenter-mode .slide { height: 62vh; bottom: auto; }
 
+/* ─── AUDIENCE MODE (clean view for projector) ─── */
+body.audience-mode .progress,
+body.audience-mode .slide-counter,
+body.audience-mode .nav-hint,
+body.audience-mode .presenter-panel { display: none !important; }
+
+/* ─── CONSOLE MODE (lightweight presenter window) ─── */
+body.console-mode {
+  background: #111 !important;
+  overflow: auto;
+}
+body.console-mode .slide,
+body.console-mode .progress,
+body.console-mode .slide-counter,
+body.console-mode .nav-hint,
+body.console-mode .presenter-panel { display: none !important; }
+body.console-mode .presenter-console { display: flex !important; }
+
+.presenter-console {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  background: #111;
+  color: #e8e4dc;
+  font-family: var(--font-body);
+  direction: rtl;
+  flex-direction: column;
+}
+
+.pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: #0a0a0a;
+  border-bottom: 2px solid var(--coral);
+  flex-shrink: 0;
+}
+.pc-header-slide {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  color: var(--coral);
+}
+.pc-header-next {
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  color: rgba(255,255,255,0.35);
+  font-weight: 300;
+}
+
+.pc-notes {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 36px 24px;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  line-height: 2;
+  font-weight: 300;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+.pc-notes strong { color: var(--coral); font-weight: 700; }
+.pc-notes em { opacity: 0.5; font-style: normal; }
+.pc-notes br + br { display: block; content: ''; margin-top: 10px; }
+
+.pc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 28px;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  direction: ltr;
+}
+.pc-footer-timer {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Inter', monospace;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--coral);
+}
+.pc-footer-clock {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Inter', monospace;
+  font-size: 15px;
+  color: rgba(255,255,255,0.45);
+}
+.pc-footer-slide {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .slide { padding: 48px 28px; }
@@ -1284,7 +1378,7 @@ body.blacked-out::after {
 
 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
 <div class="slide-counter" id="slideCounter" dir="ltr"><span class="current">1</span> / <span id="slideTotal">-</span></div>
-<div class="nav-hint" id="navHint" dir="ltr"><kbd>Space</kbd> <kbd>↑</kbd> <kbd>↓</kbd> · <kbd>N</kbd> notes</div>
+<div class="nav-hint" id="navHint" dir="ltr"><kbd>Space</kbd> <kbd>↑</kbd> <kbd>↓</kbd> · <kbd>N</kbd> notes · <kbd>P</kbd> presenter</div>
 
 <div class="presenter-panel" id="presenterPanel">
   <div class="presenter-panel-header">
@@ -1292,6 +1386,19 @@ body.blacked-out::after {
     <span id="noteSlideNum"></span>
   </div>
   <div class="presenter-panel-body" id="noteContent"></div>
+</div>
+
+<div class="presenter-console" id="presenterConsole">
+  <div class="pc-header">
+    <span class="pc-header-slide" id="pcSlideInfo"></span>
+    <span class="pc-header-next" id="pcNextInfo"></span>
+  </div>
+  <div class="pc-notes" id="pcNotes"></div>
+  <div class="pc-footer">
+    <span class="pc-footer-timer" id="pcTimer">00:00:00</span>
+    <span class="pc-footer-slide" id="pcFooterSlide"></span>
+    <span class="pc-footer-clock" id="pcClock"></span>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1308,7 +1415,7 @@ body.blacked-out::after {
     </div>
   </div>
 
-  <aside class="notes"><em>הקהל מתיישב. אורות כבים. על המסך - סרטון של שתי דקות, עם קריינות של הפלואו.</em><br><br>רואים אותי עובדת. 7 רגעים שזורמים זה בתוך זה:<br><br>1. צוללת לדאטה לבד (פעם הייתי צריכה אנליסטית). 2. שולחת אייג'נטים לצלם איך מתחרים פתרו את הבעיה, הם מדביקים פלואוים שלמים לבורד שלי בפיגמה. 3. יושבת עם דף A4 וטוש. מציירת שמונה רעיונות. ביד. 4. מעלה את הציור ל-Cursor. הוא הופך אותו לעיצוב לפי הדיזיין סיסטם. 5. יוזר טסטינג. מדברת עם אנשים אמיתיים. 6. סינתזה של הראיונות - קצת לבד, קצת עם AI. 7. במקום פרזנטציה לסטייקהולדרים - בונה משחק בסגנון Sims.</aside>
+  <aside class="notes">רואים אותי עובדת. 7 רגעים שזורמים זה בתוך זה:<br><br>1. צוללת לדאטה לבד (פעם הייתי צריכה אנליסטית).<br>2. שולחת אייג'נטים לצלם איך מתחרים פתרו את הבעיה, הם מדביקים פלואוים שלמים לבורד שלי בפיגמה.<br>3. יושבת עם דף A4 וטוש. מציירת שמונה רעיונות. ביד.<br>4. מעלה את הציור ל-Cursor. הוא הופך אותו לעיצוב לפי הדיזיין סיסטם.<br>5. יוזר טסטינג. מדברת עם אנשים אמיתיים.<br>6. סינתזה של הראיונות — קצת לבד, קצת עם AI.<br>7. במקום פרזנטציה לסטייקהולדרים — בונה משחק בסגנון Sims שבתוכו יש פרזנטציה אחרת מאוד, ממש בסגנון המשחק, כדי שיהיה buy in בחברה לראיונות הללו.</aside>
 </section>
 
 <!-- 2 - Black silence -->
@@ -1330,14 +1437,14 @@ body.blacked-out::after {
     <div class="t-hand" style="color:var(--dark-text);font-size:clamp(6rem,22vw,18rem);line-height:0.85;">חצות.</div>
   </div>
 
-  <aside class="notes"><em>מחייכת קצת. יותר לעצמי מאשר לקהל.</em><br><br>"אני רוצה להחזיר אתכם לרגע אחד בזמן.<br><br>אני בת 11.<br><br>חצות. כל הבית ישן, ורק בחדר שלי יש אור כחלחל מהמסך.<br><br>אני בונה אתר מעריצים לפיבי מ'מכושפות'."</aside>
+  <aside class="notes"><em>מחייכת קצת. יותר לעצמי מאשר לקהל.</em><br><br>״אני רוצה להחזיר אתכם לרגע אחד בזמן.<br><br>אני בת 11.<br><br>חצות. כל הבית ישן, ורק בחדר שלי יש אור כחלחל מהמסך.<br><br>אני בונה אתר מעריצים לפיבי מ'מכושפות'.״</aside>
 </section>
 
 <!-- 4 - Phoebe website (real image with fallback) -->
 <section class="slide" data-world="dark" id="s4" style="padding:0;">
   <img src="fibs.jpg" alt="Phoebe fan page" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;background:#000;" onerror="this.parentElement.style.background='linear-gradient(135deg,#1a0040,#000080)';this.style.display='none';"/>
 
-  <aside class="notes"><em>חיוך קטן. האנרגיה מתחממת.</em><br><br>"ה-HTML היה נוראי.<br><br>הצבעים היו..."<br><br><em>עוצרת. מסתכלת למעלה.</em><br><br>"טוב. אני לא רוצה לדבר על מה הצבעים היו.<br><br>הלייאאוט היה פשע נגד היוזביליות."<br><br><em>צחוק קטן מהקהל.</em></aside>
+  <aside class="notes"><em>חיוך קטן. האנרגיה מתחממת.</em><br><br>״ה-HTML היה נוראי.<br><br>הצבעים היו…״<br><br><em>עוצרת. מסתכלת למעלה.</em><br><br>״טוב.<br><br>אני לא רוצה לדבר על מה הצבעים היו.<br><br>הלייאאוט היה פשע נגד היוזביליות.״<br><br><em>צחוק קטן מהקהל.</em></aside>
 </section>
 
 <!-- 5 - The feeling -->
@@ -1346,17 +1453,17 @@ body.blacked-out::after {
     <div class="t-huge">ליצור משהו<br>שלא היה קיים לפני.</div>
   </div>
 
-  <aside class="notes">"אבל אני זוכרת שישבתי בחדר שלי, והייתה לי מעין הרגשה כזאת.<br><br>לא 'אני לומדת סקיל עם ערך'.<br><br>לא 'זה יראה טוב בפורטפוליו שלי'.<br><br>הייתה לי הרגשה, תחושה, לא יודעת.<br><br>של ליצור משהו שלא היה קיים לפני.<br><br>של לשחק.<br><br>של להחליט שזה ילך לשם - סתם כי זה פשוט מרגיש נכון."<br><br><em>מסתכלת לקהל. בחמימות.</em></aside>
+  <aside class="notes">״אבל אני זוכרת שישבתי בחדר שלי, והייתה לי מעין הרגשה כזאת.<br><br>לא 'אני לומדת סקיל עם ערך'.<br><br>לא 'זה יראה טוב בפורטפוליו שלי'.<br><br>הייתה לי הרגשה, תחושה, לא יודעת.<br><br>של ליצור משהו שלא היה קיים לפני.<br><br>של לשחק.<br><br>של להחליט שזה ילך לשם —<br><br>סתם כי זה פשוט מרגיש נכון.״<br><br><em>מסתכלת לקהל. בחמימות.</em></aside>
 </section>
 
 <!-- 6 - Flow -->
 <section class="slide" data-world="dark" id="s6">
   <div class="slide-inner slide-content anim-scale full-center">
-    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(3.5rem,10vw,9rem);line-height:0.9;">יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו,
-      .</div>
+    <div class="t-hand" style="color:var(--coral-light);font-size:clamp(3.5rem,10vw,9rem);line-height:0.9;">יצרנו משהו מאפס, נכנסנו לטראנס,</div>
+    <div class="t-hand" style="color:var(--coral);font-size:clamp(6rem,22vw,18rem);line-height:0.85;margin-top:16px;">לפלואו</div>
   </div>
 
-  <aside class="notes">"זו העיקרון שחלקנו בחדר הזה. לא?<br><br>בגלל שמתישהו - בגיל 11, בגיל 17, בגיל 28 - הרגשנו את ההרגשה הזו.<br><br>נאבדנו בתוך הקראפט.<br><br>יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו, והתעוררנו ממנו אחרי שעות עם משהו שמרגיש כמו יצירת אומנות."<br><br><em>פאוזה. שתי שניות מלאות.</em></aside>
+  <aside class="notes">״זו הסיבה שחלקנו בחדר הזה. לא?<br><br>בגלל שמתישהו — בגיל 11, בגיל 17, בגיל 28 — הרגשנו את ההרגשה הזו.<br><br>נאבדנו בתוך הקראפט.<br><br>יצרנו משהו מאפס, נכנסנו לטראנס, לפלואו,<br><br>והתעוררנו ממנו אחרי שעות עם משהו שמרגיש כמו יצירת אומנות.״<br><br><em>פאוזה. שתי שניות מלאות.</em></aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1370,7 +1477,7 @@ body.blacked-out::after {
     <div class="t-medium muted" style="max-width:640px;">בכאוס. ביצירה.<br>בלהתחיל עם קנבס ריק ולסיים עם מוצר.</div>
   </div>
 
-  <aside class="notes"><em>האנרגיה משתנה. עדיין חם. אבל יותר כן, יותר ישיר.</em><br><br>"אני רוצה לספר לכם מה קרה לילדה הזאת.<br><br>היא גדלה.<br><br>עשתה תואר אומנותי.<br><br>נכנסה להייטק.<br><br>והופתעה לגלות כמה אומנות יש בליצור מוצר.<br><br>התאהבה בניהול מוצר.<br><br>בכאוס היצירתי שהופך ליצירה מוגמרת.<br><br>בלהיות עם קנבס ריק - ולסיים עם מוצר."</aside>
+  <aside class="notes"><em>האנרגיה משתנה. עדיין חם. אבל יותר כן, יותר ישיר.</em><br><br>״אני רוצה לספר לכם מה קרה לילדה הזאת.<br><br>היא גדלה.<br><br>עשתה תואר אומנותי.<br><br>נכנסה להייטק.<br><br>והופתעה לגלות כמה אומנות יש בליצור מוצר.<br><br>התאהבה בניהול מוצר.<br><br>בכאוס היצירתי שהופך ליצירה מוגמרת.<br><br>בלהיות עם קנבס ריק — ולסיים עם מוצר.״</aside>
 </section>
 
 <!-- 8 - 9 years -->
@@ -1380,7 +1487,7 @@ body.blacked-out::after {
     <div class="t-large" style="opacity:0.5;margin-top:-8px;">שנים.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה. משנה אנרגיה.</em><br><br>"אבל התפקיד השתנה במהלך 9 השנים האחרונות.<br><br>ככל שהזמן עבר, שנה אחרי שנה, משהו נלקח מהילדה הזאת שהייתה העיקרון שבחרתי במקצוע הזה בכלל."</aside>
+  <aside class="notes"><em>פאוזה. משנה אנרגיה.</em><br><br>״אבל התפקיד השתנה במהלך 9 השנים האחרונות.<br><br>ככל שהזמן עבר, שנה אחרי שנה,<br><br>משהו נלקח מהילדה הזאת שהייתה הסיבה שבחרתי במקצוע הזה בכלל.״</aside>
 </section>
 
 <!-- 9 - Chaos tools (real screenshot with fallback) -->
@@ -1413,7 +1520,7 @@ body.blacked-out::after {
     </div>
   </div>
 
-  <aside class="notes"><em>הקצב פה חשוב. לא למהר. כל כלי הוא סבל נוסף.</em><br><br>"התווספו עוד שלבים לפלואו שלי.<br><br>עוד תלויות.<br><br>עוד כלים.<br><br>כמויות של חלונות פתוחים - ספרדשיט, פיגמה, ג'ירה, סלאק, זום - ועוד אינסוף, באמת."</aside>
+  <aside class="notes"><em>הקצב פה חשוב. לא למהר. כל כלי הוא סבל נוסף.</em><br><br>״התווספו עוד שלבים לפלואו שלי.<br><br>עוד תלויות.<br><br>עוד כלים.<br><br>כמויות של חלונות פתוחים —<br><br>ספרדשיט, פיגמה, ג'ירה, סלאק, זום — ועוד אינסוף, באמת.״</aside>
 </section>
 
 <!-- 10 - Meetings -->
@@ -1433,7 +1540,7 @@ body.blacked-out::after {
     <div class="t-body muted mt-md center">על פגישה.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה קצרה.</em><br><br>"והתחילו להיות לי כמויות של פגישות סינכרון.<br><br>באחת החברות הקודמות שעבדתי בה, לקראת פגישה של הצגה של מה עשינו החודש - הייתה פגישה כדי לתכנן תוכן עבור הפגישה החודשית, אחריה הכנו סליידים לפגישה. ואז עוד פגישה כדי להסתנכרן על הסליידים שהכנו לפגישה. ואז הפגישה עצמה. ואחרי הפגישה - עוד פגישה של רטרוספקטיב על הפגישה."<br><br><em>פאוזה. האנרגיה מתכנסת.</em><br><br>"וזה לא רק הפגישה של הרטרו אחרי הפגישה לקראת הפגישה הבאה."<br><br><em>חיוך (מעט עצוב, בלי העיניים).</em></aside>
+  <aside class="notes"><em>פאוזה קצרה.</em><br><br>״והתחילו להיות לי כמויות של פגישות סינכרון.<br><br>באחת החברות הקודמות שעבדתי בה,<br><br>לקראת פגישה של הצגה של מה עשינו החודש —<br><br>הייתה פגישה כדי לתכנן תוכן עבור הפגישה החודשית, אחריה הכנו סליידים לפגישה. ואז עוד פגישה כדי להסתנכרן על הסליידים שהכנו לפגישה. ואז הפגישה עצמה. ואחרי הפגישה — עוד פגישה של רטרוספקטיב על הפגישה.״<br><br><em>פאוזה. האנרגיה מתכנסת.</em><br><br>״וזה לא רק הפגישה של הרטרו אחרי הפגישה לקראת הפגישה הבאה.<br><br><em>חיוך (מעט עצוב, בלי העיניים)</em></aside>
 </section>
 
 <!-- 11 - Factory -->
@@ -1442,7 +1549,7 @@ body.blacked-out::after {
     <div class="t-mega" style="letter-spacing:-0.03em;">מפעל<br>ייצור.</div>
   </div>
 
-  <aside class="notes">"זה גם זה שלמדתי את הפרוסס. את הפוליטיקה.<br><br>לתקתק פיתרונות כי יש לחץ.<br><br>לתקתק פיצ'רים."<br><br><em>לבלוע רוק. להסתכל למטה. פאוזה של שלוש שניות - אמיתית.</em><br><br>"התחלתי להרגיש יותר כמו מפעל ייצור מיוצרת."<br><br><em>פאוזה ארוכה. לתת לזה לשבת.</em></aside>
+  <aside class="notes">זה גם זה שלמדתי את הפרוסס. את הפוליטיקה.<br><br>לתקתק פיתרונות כי יש לחץ.<br><br>לתקתק פיצ'רים.<br><br><em>לבלוע רוק. להסתכל למטה. פאוזה של שלוש שניות — אמיתית.</em><br><br>״התחלתי להרגיש יותר כמו מפעל ייצור מיוצרת.״<br><br><em>פאוזה ארוכה. לתת לזה לשבת.</em></aside>
 </section>
 
 <!-- 12 - Producing through me -->
@@ -1452,7 +1559,7 @@ body.blacked-out::after {
     <div class="t-huge" style="max-width:700px;position:relative;z-index:2;">לא אני יוצרת.<br><span class="coral" style="font-weight:900;">מייצרים דרכי.</span></div>
   </div>
 
-  <aside class="notes">"וזאת לא תלונה על עומס.<br><br>אני יודעת שזה יכול להישמע ככה.<br><br>זה גדול מזה.<br><br>הרגשתי שכמו נלקחה ממני היכולת להחליט בעצמי על עצמי.<br><br>מעין חוויה של - 'לא אני יוצרת. מייצרים דרכי.'"<br><br><em>פאוזה של שלוש שניות.</em></aside>
+  <aside class="notes">״וזאת לא תלונה על עומס.<br><br>אני יודעת שזה יכול להישמע ככה.<br><br>זה גדול מזה.<br><br>הרגשתי שכמו נלקחה ממני היכולת להחליט בעצמי על עצמי.<br><br>מעין חוויה של —<br><br>'לא אני יוצרת. מייצרים דרכי.'״<br><br><em>פאוזה של שלוש שניות.</em></aside>
 </section>
 
 <!-- 13 - Lazy prompt -->
@@ -1463,7 +1570,7 @@ body.blacked-out::after {
     </div>
   </div>
 
-  <aside class="notes"><em>אנרגיה יורדת. יותר אינטימי.</em><br><br>"והאמת - כשהתחלנו לעבוד עם AI, הרגשתי שזה נלקח ממני אפילו יותר."<br><br><em>פאוזה.</em><br><br>"נגיד, הייתה איזו פעם אחת שהיה לי רעיון גולמי.<br><br>משהו שבאמת הרגשתי מהבטן, על יצירת חוויה טובה.<br><br>אבל הייתי עייפה.<br><br>ולא היה לי כוח לזקק אותו.<br><br>שלחתי אותו לצ'אט ואמרתי: 'תכתוב מזה פוסט לינקדאין חזק.'"</aside>
+  <aside class="notes"><em>אנרגיה יורדת. יותר אינטימי.</em><br><br>״והאמת —<br><br>כשהתחלנו לעבוד עם AI,<br><br>הרגשתי שזה נלקח ממני אפילו יותר.״<br><br><em>פאוזה.</em><br><br>״נגיד, הייתה איזו פעם אחת שהיה לי רעיון גולמי.<br><br>משהו שבאמת הרגשתי מהבטן, על יצירת חוויה טובה.<br><br>אבל הייתי עייפה.<br><br>ולא היה לי כוח לזקק אותו.<br><br>שלחתי אותו לצ'אט ואמרתי:<br><br>'תכתוב מזה פוסט לינקדאין חזק.'״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 13b - False pride -->
@@ -1472,7 +1579,7 @@ body.blacked-out::after {
     <div class="t-large">מבנה מושלם.<br><span class="coral">בעל סמכות.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"והוא עטף את זה במילים מבריקות.<br><br>מבנה מושלם.<br><br>והוא גם כתב את זה עם ביטחון.<br><br>הוא הרגיש לי בעל סמכות."<br><br><em>חיוך קטן, ציני.</em><br><br>"בקיצור - העליתי."</aside>
+  <aside class="notes">״והוא עטף את זה במילים מבריקות.<br><br>מבנה מושלם.<br><br>והוא גם כתב את זה עם ביטחון.<br><br>הוא הרגיש לי בעל סמכות.״<br><br><em>חיוך קטן, ציני.</em><br><br>״בקיצור —<br><br>העליתי.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 13c - Feed scroll: two near-identical LinkedIn posts -->
@@ -1523,7 +1630,7 @@ body.blacked-out::after {
     <div class="t-body muted mt-md center" style="max-width:600px;">אותו מבנה. אותו אורך. <span class="coral">אותו קול.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"כמה ימים אחרי, אני גוללת בפיד, ורואה פוסט של קולגה.<br><br>אותו מבנה.<br><br>מטאפורה ממש דומה."<br><br><em>פאוזה. מסתכלת בקהל ישירות.</em><br><br>"באותו רגע הבנתי:<br><br>לא כתבתי פוסט.<br><br>פשוט הפעלתי אלגוריתם.<br><br>והאלגוריתם הזה? הוא לא שלי. הוא לא אני.<br><br>איבדתי את הקול הייחודי שלי בשביל לחסוך חצי שעה של מחשבה."</aside>
+  <aside class="notes">״כמה ימים אחרי, אני גוללת בפיד,<br><br>ורואה פוסט של קולגה.<br><br>אותו מבנה.<br><br>מטאפורה ממש דומה.״<br><br><em>פאוזה. מסתכלת בקהל ישירות.</em><br><br>״באותו רגע הבנתי:<br><br>לא כתבתי פוסט.<br><br>פשוט הפעלתי אלגוריתם.<br><br>והאלגוריתם הזה?<br><br>הוא לא שלי.<br><br>הוא לא אני.<br><br>איבדתי את הקול הייחודי שלי בשביל לחסוך חצי שעה של מחשבה.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 14 - Algorithm, not voice -->
@@ -1533,7 +1640,7 @@ body.blacked-out::after {
     <div class="t-huge coral">הפעלתי אלגוריתם.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"וזה ממקום אנושי. של נוחות.<br><br>זה באמת ממש ממש נוח."<br><br><em>חיוך אנושי. הודאה.</em></aside>
+  <aside class="notes">״וזה ממקום אנושי. של נוחות.<br><br>זה באמת ממש ממש נוח.״<br><br><em>חיוך אנושי. הודאה.</em><br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 15 - Automation of thought -->
@@ -1543,7 +1650,7 @@ body.blacked-out::after {
     <div style="margin-top:20px;font-size:clamp(1.1rem,2.5vw,1.8rem);font-weight:300;letter-spacing:0.06em;color:#fff;">ולא שמתי לב.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"וזה המשיך.<br><br>עשיתי וורקפלואו. אוטומציה. אינטגרציות שעזרו לי לדלוור במהירות שיא.<br><br>ובלי לשים לב, האוטומציה שעשיתי עם AI לא עצרה רק בדברים הטכניים.<br><br>היא התחילה לעשות אוטומציה גם למחשבה שלי."<br><br><em>פאוזה. יותר לאט.</em><br><br>"בשלב מסוים השריר של היצירה פשוט הפסיק לעבוד.<br><br>התחלתי לנבול.<br><br>לא בדרמטיות. בשקט."<br><br><em>פאוזה קצרה.</em></aside>
+  <aside class="notes">״וזה המשיך.<br><br>עשיתי וורקפלואו. אוטומציה. אינטגרציות שעזרו לי לדלוור במהירות שיא.<br><br>ובלי לשים לב,<br><br>האוטומציה שעשיתי עם AI לא עצרה רק בדברים הטכניים.<br><br>היא התחילה לעשות אוטומציה גם למחשבה שלי.״<br><br><em>פאוזה. יותר לאט.</em><br><br>״בשלב מסוים השריר של היצירה פשוט הפסיק לעבוד.<br><br>התחלתי לנבול.<br><br>לא בדרמטיות. בשקט.״<br><br><em>פאוזה קצרה.</em></aside>
 </section>
 
 <!-- 16 - Sababa (whisper) -->
@@ -1552,7 +1659,7 @@ body.blacked-out::after {
     <div style="position:absolute;bottom:15%;left:8%;font-size:clamp(1.4rem,3.5vw,2.4rem);color:#fff;opacity:0.85;font-weight:400;letter-spacing:0.04em;">סבבה.</div>
   </div>
 
-  <aside class="notes">"אני זוכרת את הרגע שהבנתי.<br><br>הוצאתי פיצ'ר. עם מטריקות טובות.<br><br>ישבתי בישיבת הצגה, והבוסית אמרה 'עבודה מעולה'.<br><br>ואני חשבתי - 'סבבה.'<br><br>ועברתי לפיצ'ר הבא."<br><br><em>פאוזה.</em><br><br>"לא התרגשתי.<br><br>לא ידעתי להתרגש יותר."<br><br><em>פאוזה ארוכה.</em></aside>
+  <aside class="notes">״אני זוכרת את הרגע שהבנתי.<br><br>הוצאתי פיצ'ר. עם מטריקות טובות.<br><br>ישבתי בישיבת הצגה, והבוסית אמרה 'עבודה מעולה'.<br><br>ואני חשבתי —<br><br>'סבבה.'<br><br>ועברתי לפיצ'ר הבא.״<br><br><em>פאוזה.</em><br><br>״לא התרגשתי.<br><br>לא ידעתי להתרגש יותר.״<br><br><em>פאוזה ארוכה.</em></aside>
 </section>
 
 <!-- 17 - Betrayal -->
@@ -1561,16 +1668,17 @@ body.blacked-out::after {
     <div class="t-huge" style="max-width:700px;">הסגרתי אותה<br>לרשויות ה-AI.</div>
   </div>
 
-  <aside class="notes">"והילדה הזאת - שנשארה ערה עד חצות כי להיאבד בקראפט הייתה ההרגשה הכי טובה בעולם - נהייתה שקטה יותר.<br><br>ושקטה יותר.<br><br>עד שיום אחד שכחתי ממנה לגמרי."<br><br><em>פאוזה ארוכה. 4-5 שניות.</em><br><br>"והפלואו המסורבל והפרוסס התחילו עם זה.<br><br>אבל האמת העצובה, גם בלי קשר לזה -"<br><br><em>פאוזה.</em><br><br>"אני הסגרתי אותה לרשויות ה-AI.<br><br>לשם הנוחות."</aside>
+  <aside class="notes">״והילדה הזאת —<br><br>שנשארה ערה עד חצות כי להיאבד בקראפט הייתה ההרגשה הכי טובה בעולם —<br><br>נהייתה שקטה יותר.<br><br>ושקטה יותר.<br><br>עד שיום אחד שכחתי ממנה לגמרי.״<br><br><em>פאוזה ארוכה. 4–5 שניות.</em><br><br>״והפלואו המסורבל והפרוסס התחילו עם זה.<br><br>אבל האמת העצובה,<br><br>גם בלי קשר לזה —״<br><br><em>פאוזה.</em><br><br>״אני הסגרתי אותה לרשויות ה-AI.<br><br>לשם הנוחות.״</aside>
 </section>
 
-<!-- 17b - Breath -->
-<section class="slide" data-world="void" id="s17b">
-  <div class="slide-inner slide-content full-center">
-    <div class="t-medium" style="max-width:700px;opacity:0.5;font-style:italic;">בשלב מסוים התחלתי לעבוד בצורה קצת אחרת עם AI...</div>
+<!-- 17b - Pivot -->
+<section class="slide" data-world="void" id="s17b" style="overflow:hidden;">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100vw;height:100vh;background:radial-gradient(ellipse 50% 45% at center,rgba(255,107,53,0.08) 0%,transparent 65%);pointer-events:none;"></div>
+  <div class="slide-inner slide-content full-center" style="position:relative;z-index:2;">
+    <div class="t-large" style="max-width:850px;line-height:1.5;font-weight:400;">בשלב מסוים התחלתי לעבוד<br>בצורה <span class="coral" style="font-weight:700;">קצת אחרת</span> עם AI.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה של 4 שניות. לא למלא אותה.</em></aside>
+  <aside class="notes"><em>פאוזה של 4 שניות. לא למלא אותה.</em><br><br><em>(על המסך מופיע המשפט האיטלקי על עבודה אחרת עם AI — התסריט המילולי כאן הוא רק השתקה.)</em></aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1592,7 +1700,7 @@ body.blacked-out::after {
     <div style="width:60px;height:3px;background:var(--coral);margin-top:32px;border-radius:2px;opacity:0.5;"></div>
   </div>
 
-  <aside class="notes"><em>מרימה מבט. שינוי אנרגיה. יותר קלה. לא מנחמת - מזמינה.</em><br><br>"בשלב מסוים התחלתי לעבוד בצורה קצת אחרת עם AI. וחזרה לי התשוקה. הדרייב.<br><br>אני מרגישה שוב שאני יוצרת - לא מייצרת.<br><br>ולא למרות AI.<br><br><strong>בזכותו.</strong>"</aside>
+  <aside class="notes"><em>מרימה מבט. שינוי אנרגיה. יותר קלה. לא מנחמת — מזמינה.</em><br><br>בשלב מסוים התחלתי לעבוד בצורה קצת אחרת עם AI. וחזרה לי התשוקה. הדרייב. אני מרגישה שוב שאני יוצרת — לא מייצרת.<br><br>ולא למרות AI.<br><br><strong>בזכותו.</strong></aside>
 </section>
 
 <!-- 18b - Found the girl -->
@@ -1601,17 +1709,22 @@ body.blacked-out::after {
     <div class="t-large" style="max-width:700px;">אני פה כי מצאתי את הילדה הזו שוב.<br><span class="coral">בטעות.</span></div>
   </div>
 
-  <aside class="notes">"אני פה כי מצאתי את הילדה הזו שוב. בטעות. ואני רוצה לספר לכם איך."<br><br><em>פאוזה קצרה. הצגה עצמית מהירה.</em></aside>
+  <aside class="notes">אני פה כי מצאתי את הילדה הזו שוב. בטעות. ואני רוצה לספר לכם איך.<br><br><em>פאוזה קצרה. הצגה עצמית מהירה.</em></aside>
 </section>
 
 <!-- 19 - Intro -->
 <section class="slide" data-world="light" id="s19">
-  <div class="slide-inner slide-content full-center gap-sm">
-    <div class="t-huge" style="color:var(--light-text);">גל דולב</div>
-    <div class="t-body" style="opacity:0.6;">PM & AI Lead · Guide</div>
+  <div style="position:absolute;top:50%;left:12vw;transform:translateY(-50%);z-index:3;">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120%;height:120%;background:radial-gradient(circle,rgba(255,107,53,0.07) 0%,transparent 70%);pointer-events:none;filter:blur(40px);"></div>
+    <img src="Frame-2147255694.png" alt="גל דולב" style="position:relative;height:clamp(280px,52vh,480px);width:auto;object-fit:contain;border-radius:16px;filter:drop-shadow(0 16px 40px rgba(28,25,23,0.12)) drop-shadow(0 4px 12px rgba(28,25,23,0.08));"/>
+  </div>
+  <div style="position:absolute;top:50%;right:10%;transform:translateY(-50%);z-index:2;text-align:right;">
+    <div style="font-size:clamp(5rem,13vw,11rem);font-weight:900;line-height:0.95;font-family:var(--font-display);letter-spacing:-0.04em;color:var(--light-text);">גל דולב</div>
+    <div style="width:64px;height:4px;background:var(--coral);margin:32px 0 24px;border-radius:2px;"></div>
+    <div style="font-size:clamp(1.4rem,2.8vw,2.2rem);font-weight:300;opacity:0.45;letter-spacing:0.02em;">PM & AI Lead · Guidde</div>
   </div>
 
-  <aside class="notes">"דרך אגב - שלום.<br><br>אני גל דולב.<br><br>עד לא מזמן הייתי AI Guild Lead בתאגיד שכולכם מכירים.<br><br>היום אני PM ו-AI Lead בגייד.<br><br>בשנה האחרונה ייעצתי לראשי מחלקות דיזיין ופרודקט ולמנכ״לים של חברות חזקות בנושא.<br><br>וליוויתי מאות אנשים בטרנספורמציה של ממש בעולם ה-AI.<br><br>וראיתי שוב ושוב מה מבדיל אנשים שיוצרים פתרונות לא טובים עם AI - לאנשים שיוצרים חוויות מעולות."</aside>
+  <aside class="notes">״דרך אגב — שלום.<br><br>אני גל דולב.<br><br>עד לא מזמן הייתי AI Guild Lead בתאגיד שכולכם מכירים.<br><br>היום אני PM ו-AI Lead בגייד.<br><br>בשנתיים האחרונות ייעצתי לראשי מחלקות דיזיין ופרודקט ולמנכ״לים של חברות חזקות בנושא.<br><br>וליוויתי מאות אנשים בטרנספורמציה של ממש בעולם ה-AI.<br><br>וראיתי שוב ושוב מה מבדיל אנשים שיוצרים פתרונות לא טובים עם AI —<br><br>לאנשים שיוצרים חוויות מעולות.״</aside>
 </section>
 
 <!-- 20 - What differentiates -->
@@ -1622,7 +1735,7 @@ body.blacked-out::after {
     <div style="font-size:clamp(0.9rem,1.8vw,1.3rem);font-weight:300;opacity:0.5;margin-top:1.2em;max-width:600px;margin-inline:auto;line-height:1.7;">על מה רק בני אדם יכולים לעשות -<br>ולמה דווקא עכשיו זה היקר ביותר שיש לנו.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"זה לא הכלים שהם משתמשים בהם.<br><br>זה לא כמה שעות הם עובדים.<br><br>זה הבנה אחת עמוקה - על מה רק בני אדם יכולים לעשות.<br><br>ולמה דווקא עכשיו, בעידן ה-AI, הדבר הזה הפך להיות היקר ביותר שיש לנו."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״זה לא הכלים שהם משתמשים בהם.<br><br>זה לא כמה שעות הם עובדים.<br><br>זה הבנה אחת עמוקה —<br><br>על מה רק בני אדם יכולים לעשות.<br><br>ולמה דווקא עכשיו, בעידן ה-AI,<br><br>הדבר הזה הפך להיות היקר ביותר שיש לנו.״</aside>
 </section>
 
 <!-- 21 - The promise -->
@@ -1636,7 +1749,7 @@ body.blacked-out::after {
     <div style="width:60px;height:2px;background:linear-gradient(90deg, transparent, var(--coral), transparent);margin-top:8px;opacity:0.6;"></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"ואני הולכת לתת לכם את זה היום."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״ואני הולכת לתת לכם את זה היום.״</aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1674,7 +1787,7 @@ body.blacked-out::after {
     </svg>
   </div>
 
-  <aside class="notes">"הבסיס להכל הוא הבנה אחת של איך AI עובד.<br><br>AI עונה לפי סבירות סטטיסטית.<br><br>הוא נועד לקלוע לממוצע.<br><br>אבל חדשנות, הבנה של סאבטקסט, חוויית משתמש טובה - זו לא הממוצע.<br><br>זו סטיית תקן.<br><br>זה הדיוק של הרגע האנושי."</aside>
+  <aside class="notes"><em>סלייד: AI הוא מלך הממוצע.</em><br><br>״הבסיס להכל הוא הבנה אחת של איך AI עובד.<br><br>AI עונה לפי סבירות סטטיסטית.<br><br>הוא נועד לקלוע לממוצע.<br><br>אבל חדשנות, הבנה של סאבטקסט, חוויית משתמש טובה —<br><br>זו לא הממוצע.<br><br>זו סטיית תקן.<br><br>זה הדיוק של הרגע האנושי.״</aside>
 </section>
 
 <!-- 23 - Innovation = std deviation -->
@@ -1705,7 +1818,7 @@ body.blacked-out::after {
     </svg>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"אם נסתמך רק על המודל - נקבל פתרון גנרי ששוכפל לעוד עשרה אנשים בשעה האחרונה.<br><br>כמו הפוסט ההוא בלינקדאין."<br><br><em>חיוך קצר של הכרה.</em></aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״אם נסתמך רק על המודל —<br><br>נקבל פתרון גנרי ששוכפל לעוד עשרה אנשים בשעה האחרונה.<br><br>כמו הפוסט ההוא בלינקדאין.״<br><br><em>חיוך קצר של הכרה.</em></aside>
 </section>
 
 <!-- 24 - Map of 3 reasons -->
@@ -1719,7 +1832,7 @@ body.blacked-out::after {
     </ol>
   </div>
 
-  <aside class="notes">"מעצבים שהוציאו תוצרים מעולים מ-AI - לא כאלה שנראים מרשימים, כאלה שאנשים באמת רוצים להשתמש בהם - הבינו שלושה דברים.<br><br>שלושה דברים שהמחקר מאשש, ושה-AI פשוט לא יכול לעשות לבד."<br><br><em>פאוזה.</em><br><br>"ולמה דווקא עכשיו - הם יותר נחוצים מתמיד."</aside>
+  <aside class="notes">״מעצבים שליוויתי ולמדתי מהם שהוציאו תוצרים מעולים מ-AI<br><br>הבינו איפה הוא חזק ואיפה הוא חלש,<br><br>והם משתמשים בו בהתאם.<br><br>בגדול, הם הפנימו שלושה עקרונות קריטים —״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1728,9 +1841,9 @@ body.blacked-out::after {
 
 <!-- 25 - DMN -->
 <section class="slide" data-world="light-warm" id="s25">
-  <div class="slide-inner slide-content gap-md">
+  <div class="slide-inner slide-content gap-md full-center">
     <div class="section-badge">עיקרון 1</div>
-    <div class="t-large" style="max-width:700px;">המוח שלכם מייצר חדשנות<br><span class="coral">כשהוא נודד.</span></div>
+    <div class="t-large" style="max-width:700px;text-align:center;">המוח שלכם מייצר חדשנות<br><span class="coral">כשהוא נודד.</span></div>
     <svg class="dmn-network" viewBox="0 0 600 300" style="width:100%;max-width:680px;margin-top:32px;">
       <defs>
         <filter id="nodeGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -1761,12 +1874,12 @@ body.blacked-out::after {
       <text x="380" y="74" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">חלום</text>
       <text x="510" y="134" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">תובנה</text>
       <text x="160" y="256" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">גוף</text>
-      <text x="300" y="276" text-anchor="middle" fill="var(--coral)" font-size="26" font-weight="700" opacity="1">DMN</text>
+      <text x="300" y="280" text-anchor="middle" fill="var(--coral)" font-size="42" font-weight="700" opacity="1">DMN</text>
       <text x="440" y="232" text-anchor="middle" fill="var(--light-text)" font-size="22" font-weight="700" opacity="0.8">אינטואיציה</text>
     </svg>
   </div>
 
-  <aside class="notes">"יש במוח שלנו רשת שנקראת DMN - Default Mode Network.<br><br>זו הרשת שפעילה כשאנחנו בבהיה.<br><br>בחלומות בהקיץ. באסוציאציות רחוקות.<br><br>שם, בבלגן הזה, המוח מפסיק להיות לינארי.<br><br>ההיפוקמפוס - הספרן של המוח - שולף חתיכות זיכרון לא קשורות, רגשות, חוויות אישיות, ומחבר אותן בדרכים חדשות."</aside>
+  <aside class="notes"><em>עקרון ראשון: המוח שלכם מייצר חדשנות כשהוא נודד.</em><br><br>״יש במוח שלנו רשת שנקראת DMN — Default Mode Network.<br><br>זו הרשת שפעילה כשאנחנו בבהיה.<br><br>בחלומות בהקיץ. באסוציאציות רחוקות.<br><br>שם, בבלגן הזה, המוח מפסיק להיות לינארי.<br><br>ההיפוקמפוס — הספרן של המוח —<br><br>שולף חתיכות זיכרון לא קשורות, רגשות, חוויות אישיות,<br><br>ומחבר אותן בדרכים חדשות.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <style>
@@ -1783,7 +1896,7 @@ body.blacked-out::after {
     <div class="t-mega t-hand coral mt-sm">אסוציאציה פרועה.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"זה בדיוק מה שהילדה בת ה-11 ידעה לעשות באופן טבעי.<br><br>'הצבע הזה ילך לשם כי זה מרגיש נכון.'<br><br>זה לא לוגיקה. זה אסוציאציה פרועה.<br><br>וזו הנשמה של חדשנות אמיתית.<br><br>AI חלש שם. מאוד חלש."</aside>
+  <aside class="notes">הרגעים הגדולים של איינשטיין, של סטיב ג'ובס — היו כאלה.<br><br>זה לא לוגיקה. זה אסוציאציה פרועה.<br><br>וזה הכרחי לחדשנות.<br><br>AI חלש שם.<br><br>מאוד חלש.</aside>
 </section>
 
 <!-- 27 - Medicine app: cold AI vs warm human -->
@@ -1807,7 +1920,7 @@ body.blacked-out::after {
     <div class="t-body muted center" style="max-width:640px;">תזכורת זה לא הפתרון. <span class="coral" style="font-weight:700;">אחריות משותפת - כן.</span></div>
   </div>
 
-  <aside class="notes">"דוגמה קונקרטית.<br><br>תבקשו מ-AI לעצב אפליקציית תזכורות לתרופות.<br><br>מה הוא יציע? נוטיפיקציה. עם כפתור 'אישור'.<br><br>הגיוני סטטיסטית. ומשעמם רצח."<br><br><em>צחוק.</em><br><br>"עכשיו המוח שלכם.<br><br>אתם בנהיגה חזרה מהעבודה, ופתאום עולה לכם זיכרון מהריב שהיה לכם הבוקר עם בן הזוג כי הוא שכח לקנות חלב.<br><br>ואתם מבינים - מה שחסר במוצר זו לא תזכורת. זו אחריות משותפת.<br><br>ה-Aha Moment: לעצב פיצ'ר ששולח התראה לבן משפחה - רק אם המשתמש לא אישר את נטילת התרופה."</aside>
+  <aside class="notes"><em>סלייד הדוגמה.</em><br><br>״דוגמה קונקרטית.<br><br>תבקשו מ-AI לעצב אפליקציית תזכורות לתרופות.<br><br>מה הוא יציע?<br><br>נוטיפיקציה. עם כפתור 'אישור'.<br><br>הגיוני סטטיסטית.<br><br>ולא בהכרח הפיתרון הכי נכון ליוזרים שלכם…״<br><br><em>צחוק.</em><br><br>״עכשיו המוח שלכם.<br><br>אתם בנהיגה חזרה מהעבודה,<br><br>ופתאום עולה לכם זיכרון מהריב שהיה לכם הבוקר עם בן הזוג כי הוא שכח לקנות חלב.<br><br>ואתם מבינים —<br><br>מה שחסר במוצר זו לא תזכורת.<br><br>זו אחריות משותפת.<br><br>ה-Aha Moment:<br><br>לעצב פיצ'ר ששולח התראה לבן משפחה —<br><br>רק אם המשתמש לא אישר את נטילת התרופה.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 29 - Not in the fight -->
@@ -1816,7 +1929,7 @@ body.blacked-out::after {
     <div class="t-mega" style="color:#fff;text-shadow:0 0 80px rgba(0,0,0,0.5);">AI לא היה<br>בריב בבוקר.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"<strong>AI לא יגיע לשם. כי הוא לא היה בריב בבוקר.</strong><br><br>הוא ממוצע של הרבה מאוד ממשקים שלא בהכרח קשורים לבעיה שאנחנו צריכים לפתור - והפתרון בינוני."</aside>
+  <aside class="notes">״AI לא יגיע לשם.<br><br>כי הוא לא היה בריב בבוקר.<br><br>הוא ממוצע של הרבה מאוד ממשקים שלא בהכרח קשורים לבעיה שאנחנו צריכים לפתור — והפתרון בינוני.״<br><br><em>פאוזה קצרה.</em></aside>
 </section>
 
 <!-- 30 - Deviation is commodity (poster) -->
@@ -1828,7 +1941,7 @@ body.blacked-out::after {
     <div class="poster-text" style="text-align:center;">הסטייה שלכם היא<br><span class="coral">הסחורה היקרה ביותר בשוק.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה קצרה.</em><br><br>"הילדה שבכם, בעצם ההיותה - מייצרת את הסטייה מהתקן.<br><br>ובעידן שבו AI מייצר את התקן - הסטייה שלכם היא הסחורה היקרה ביותר בשוק."</aside>
+  <aside class="notes">״הכאוס בכם, המוח הלא ליניארי, האסוציאציות — זה מה שמייצר את הסטייה מהתקן. את החדשנות.<br><br>ובעידן שבו AI מייצר את התקן —<br><br>הסטייה שלכם היא הסחורה היקרה ביותר בשוק.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 31 - Practical tip 1 -->
@@ -1858,7 +1971,7 @@ body.blacked-out::after {
   </div>
   <div class="qr-placeholder">QR</div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"הטיפ הפרקטי:<br><br>לפני הפרומפט הראשון - תנו למחשבות לנדוד.<br><br>בראיונות משתמשים או באזורים שאנחנו מתחילים ליצור משהו חדש - פיצ׳ר חדש, שאלת מחקר, קונספט - תחכו רגע עם הפרומפט, כדי לא לתת לקול של המודל להסית אתכם מקודם כל לחשוב.<br><br>תעשו ראיונות משתמשים בעצמכם, ותשאירו לכם 5 דק׳ בסוף הרעיון לכתוב מה עלה לכם, לאן זה לקח אתכם, למה זה התקשר לכם.<br><br>תעשו לכם ברייק של 10 דק, תקחו דף A4, ותקשקשו - ורק אחר כך - פתחו את הכלי שאתם עובדים איתו.<br><br>ואז תנו לו שלושה בולטים ייחודיים לכם - את הקונטקסט הממוקד שלכם.<br><br>למה זה עובד? כי ככה אתם נשארים הקול הראשון בחדר. והוא מתאים את עצמו אליכם."</aside>
+  <aside class="notes">״הטיפ הפרקטי:<br><br>לפני הפרומפט הראשון — תנו למחשבות לנדוד. בראיונות משתמשים או באזורים שאנחנו מתחילים ליצור משהו חדש — פיצ׳ר חדש, שאלת מחקר, קונספט — תחכו רגע עם הפרומפט, כדי לא לתת לקול של המודל להסית אתכם מקודם כל לחשוב.<br><br>תעשו ראיונות משתמשים בעצמכם, ותשאירו לכם 5 דק׳ בסוף הרעיון לכתוב מה עלה לכם, לאן זה לקח אתכם, למה זה התקשר לכם.<br><br>תעשו לכם ברייק של 10 דק, תקחו דף a4, ותקשקשו —<br><br>ורק אחר כך — פתחו את הכלי שאתם עובדים איתו.<br><br>ואז תנו לו שלושה בולטים ייחודיים לכם —<br><br>את הקונטקסט הממוקד שלכם.<br><br>למה זה עובד?<br><br>כי ככה אתם נשארים הקול הראשון בחדר.<br><br>והוא מתאים את עצמו אליכם.״</aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -1918,7 +2031,7 @@ body.blacked-out::after {
     </svg>
   </div>
 
-  <aside class="notes"><em>אנרגיה מתרכזת. זה החלק העמוק של ההרצאה.</em><br><br>"יצא מחקר שתפס אותי חזק.<br><br>השוו איך מומחים אנושיים מול AI נותנים קטגוריות לראיונות עומק במחקר איכותני.<br><br>מבקרים קיבלו סינתזה של מודל, סינתזה של מומחה, ודירגו.<br><br>בשאלות קשות - על אף שהמודל היה יותר קרוב לתשובה הנכונה סטטיסטית, המומחים נתנו לתוצאה של המודל דירוג נמוך יותר."<br><br><em>פאוזה.</em><br><br>"מסתבר ש-AI מדויק סטטיסטית - אבל פשוט לא קורא את החדר.<br><br>והמומחים האנושיים נתנו תשובה שסטטיסטית לא נכונה. היא הייתה סטיית תקן.<br><br>אבל דורגה כנכונה יותר. כי היא לקחה בחשבון סאבטקסט. רגש. דברים שהמערכת העצבית שלנו מבינה - והם לא במילים."</aside>
+  <aside class="notes"><em>סיבה שנייה: הגוף שלכם קורא אנשים. AI קורא נתונים.</em><br><br><em>אנרגיה מתרכזת. זה החלק העמוק של ההרצאה.</em><br><br>״יצא מחקר שתפס אותי חזק.<br><br>השוו איך מומחים אנושיים מול AI נותנים קטגוריות לראיונות עומק במחקר איכותני.<br><br>מבקרים קיבלו סינתזה של מודל, סינתזה של מומחה אנושי, ודירגו.<br><br>בשאלות קשות —<br><br>על אף שהמודל היה יותר קרוב לתשובה הנכונה סטטיסטית,<br><br>המומחים נתנו לתוצאה של המודל דירוג נמוך יותר.״<br><br><em>פאוזה.</em><br><br>״מסתבר ש-AI מדויק סטטיסטית —<br><br>אבל פשוט לא קורא את החדר.<br><br>והמומחים האנושיים נתנו תשובה שסטטיסטית לא נכונה.<br><br>היא הייתה סטיית תקן.<br><br>אבל דורגה כנכונה יותר.<br><br>כי היא לקחה בחשבון סאבטקסט. רגש.<br><br>דברים שהמערכת העצבית שלנו מבינה — והם לא במילים.״</aside>
 </section>
 
 <!-- 33 - Subtext (with simple-questions caveat) -->
@@ -1928,7 +2041,7 @@ body.blacked-out::after {
     <div class="t-body muted center" style="max-width:600px;">בשאלות פשוטות - AI מנצח (כי אנחנו מסבכים). אבל הסאבטקסט? <span class="coral" style="font-weight:700;">שלכם.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה קצרה.</em><br><br>"דרך אגב - בשאלות פשוטות AI קיבל את הציון הגבוה יותר. כי אנחנו מסבכים יתר על המידה את הפשוט."<br><br><em>צחוק.</em><br><br><em>פאוזה. אנרגיה מתעמקת שוב.</em></aside>
+  <aside class="notes"><em>פאוזה קצרה.</em><br><br>״דרך אגב —<br><br>בשאלות פשוטות AI קיבל את הציון הגבוה יותר.<br><br>כי אנחנו מסבכים יתר על המידה את הפשוט.״<br><br><em>צחוק.</em><br><br><em>פאוזה. אנרגיה מתעמקת שוב.</em></aside>
 </section>
 
 <!-- 35 - Polanyi's Paradox (full-screen poster) -->
@@ -1941,7 +2054,7 @@ body.blacked-out::after {
     <div class="t-body muted mt-lg" style="letter-spacing:0.05em;"></div>
   </div>
 
-  <aside class="notes">"יש מושג שטבע הוגה בשם מייקל פולני.<br><br>הוא קרא לזה Polanyi's Paradox.<br><br>שש מילים שאני חושבת שכל designer בחדר הזה צריך לכתוב על הקיר מעל השולחן:"<br><br><em>פאוזה.</em><br><br>"<strong>'אנחנו יודעים יותר ממה שאנחנו יכולים להגיד.'</strong>"</aside>
+  <aside class="notes"><em>מה שאני מנסה לומר כאן בעצם.</em><br><br><em>פאוזה.</em><br><br>״'אנחנו יודעים יותר ממה שאנחנו יכולים להגיד.'״</aside>
 </section>
 
 <!-- 36 - Faces, bicycles, layout -->
@@ -1952,7 +2065,7 @@ body.blacked-out::after {
     <div class="t-large">ואתם יודעים, ברגע אחד, כש<strong>לייאאוט</strong> פשוט לא עובד - ולא תמיד תוכלו לפרק את זה לכללים.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה. תיקון הטון - לא אקדמית, אלא מזמינה.</em><br><br>"תחשבו על זה רגע.<br><br>אתם יכולים לזהות פנים של חבר ילדות בתוך אלף פנים - אבל לא תוכלו להסביר איך.<br><br>אתם יודעים לרכב על אופניים - אבל לא תוכלו להסביר למישהו בדיוק איך.<br><br>ואתם יודעים, ברגע אחד, כשלייאאוט פשוט לא עובד - ולא תמיד תוכלו לפרק את זה לכללים לפרודקט מנג'ר שמבקש הצדקה."</aside>
+  <aside class="notes">״תחשבו על זה רגע.<br><br>אתם יכולים לזהות פנים של חבר ילדות בתוך אלף פנים —<br><br>אבל לא תוכלו להסביר איך.<br><br>אתם יודעים לרכב על אופניים —<br><br>אבל לא תוכלו להסביר למישהו בדיוק איך.<br><br>ואתם יודעים, ברגע אחד, כשלייאאוט פשוט לא עובד —<br><br>ולא תמיד תוכלו לפרק את זה לכללים לפרודקט מנג'ר שמבקש הצדקה.״</aside>
 </section>
 
 <!-- 37 - Tacit knowledge experts -->
@@ -1961,7 +2074,7 @@ body.blacked-out::after {
     <div class="t-huge">אתם<br><span class="coral">מומחי ידע סמוי.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה. חיוך קטן של הכרה.</em><br><br>"כל הנוכחים פה יודעים את זה בבטן.<br><br>הסופר פאוור של רוב המעצבים שהכרתי זה כמה חזקים הם בלהרגיש את מה שלא נאמר.<br><br>אתם מומחי ידע סמוי.</aside>
+  <aside class="notes"><em>פאוזה. חיוך קטן של הכרה.</em><br><br>״הסופר פאוור של רוב המעצבים שהכרתי זה כמה חזקים הם בלהרגיש את מה שלא נאמר.<br><br>אתם מומחי ידע סמוי.״</aside>
 </section>
 
 <!-- 37b - Tacit knowledge body -->
@@ -1970,7 +2083,7 @@ body.blacked-out::after {
     <div class="t-medium" style="max-width:700px;line-height:1.7;text-align:center;">הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם -<br><br>ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br><span class="coral" style="font-weight:700;">והידע הזה הוא הדבר הכי יקר שיש לכם.</span></div>
   </div>
 
-  <aside class="notes">"הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם - ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br>והידע הזה הוא הדבר הכי יקר שיש לכם."</aside>
+  <aside class="notes">״הגוף שלכם צבר, במשך שנים של חיים, של ראיונות, של צפייה ביוזרים, של להיות בן אדם בעולם —<br><br>ידע שאף אחד, גם לא אתם, לא יכולים לנסח במילים.<br><br>והידע הזה הוא הדבר הכי יקר שיש לכם.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 38 - Body vs words -->
@@ -1979,7 +2092,7 @@ body.blacked-out::after {
     <img src="slide38-body-vs-words.png" alt="אתם: ידע בגוף. AI: רק מילים." style="width:100%;height:100%;object-fit:cover;"/>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"ואי אפשר להאכיל אותו ל-AI.<br><br>לא כי הוא טיפש.<br><br>מהותית.<br><br>ידע שחי בתוך גוף אי אפשר לקודד למילים.<br><br>ו-AI הוא רק מילים."</aside>
+  <aside class="notes">״ואי אפשר להאכיל אותו ל-AI.<br><br>לא כי הוא טיפש.<br><br>מהותית.<br><br>ידע שחי בתוך גוף אי אפשר לקודד למילים.<br><br>ו-AI הוא רק מילים.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 39 - Practical tip 2 -->
@@ -2006,7 +2119,7 @@ body.blacked-out::after {
   </div>
   <div class="qr-placeholder">QR</div>
 
-  <aside class="notes">"הטיפ הפרקטי — השתמשו באינטואיציה שלכם.<br><br>תסמנו בתוך העבודה שלכם רגעים שבהם 'אני יודע שזה לא עובד, אבל לא יודע להגיד למה'.<br><br>אלה הרגעים שבהם אתם חייבים להישאר בחדר. זה הזמן שלכם לשהות בבעיה.<br><br>ו-AI יעזור לבצע אחרי שאתם תחליטו."</aside>
+  <aside class="notes">״הטיפ הפרקטי — השתמשו באינטואיציה שלכם.<br><br>תסמנו בתוך העבודה שלכם רגעים שבהם 'אני יודע שזה לא עובד, אבל לא יודע להגיד למה'.<br><br>אלה הרגעים שבהם אתם חייבים להישאר בחדר. זה הזמן שלכם לשהות בבעיה.<br><br>ו-AI יעזור לבצע אחרי שאתם תחליטו.״</aside>
 </section>
 
 <!-- 39b - VP Design -->
@@ -2017,7 +2130,7 @@ body.blacked-out::after {
     <div class="t-huge" style="margin-top:40px;color:rgba(255,255,255,0.5);font-weight:300;">ו-AI הוא הג׳וניור.</div>
   </div>
 
-  <aside class="notes">"מזל טוב, קודמתם להיות VP Design.<br><br>ו-AI? הוא הג׳וניור שלכם.<br><br>הוא מהיר, הוא חרוץ, הוא לא ישן.<br><br>אבל הוא לא יודע מה נכון - עד שאתם תגידו לו."</aside>
+  <aside class="notes">קיצר, מזל טוב, קודמתם להיות VP Design. ו-AI הוא הג׳וניור.</aside>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -2032,7 +2145,7 @@ body.blacked-out::after {
     <div class="t-body muted mt-sm">מה שהשתנה - הכלי שמחבר ביניהם.</div>
   </div>
 
-  <aside class="notes"><em>אנרגיה יותר אופרטיבית, קלה. זו העיקרון שמחברת הכל.</em><br><br>"עכשיו שתי העקרונות הראשונות - הילדה שבכם שמייצרת חדשנות, והגוף שלכם שקורא אנשים - תמיד היו שם.<br><br>זה לא חדש.<br><br>זה מה שהופך אתכם ל-designers טובים.<br><br>אבל -"</aside>
+  <aside class="notes"><em>סיבה שלישית: שני הדברים הראשונים תמיד היו שם.</em><br><br><em>מה שהשתנה — הכלי שמחבר ביניהם.</em><br><br>״עכשיו שתי העקרונות הראשונים —<br><br>המוח הלא לינארי שבכם שמייצר חדשנות,<br><br>והגוף שלכם שקורא אנשים —<br><br>תמיד היו שם.<br><br>זה לא חדש.<br><br>זה מה שהופך אתכם למעצבים טובים.<br><br>אבל —״</aside>
 </section>
 
 <!-- 41 - 20 cuts: scattered tools -->
@@ -2059,7 +2172,7 @@ body.blacked-out::after {
     <div class="t-medium center mt-md" style="opacity:0.7;">~20 כלים. <span class="coral" style="font-weight:700;">חיתוכים של תשומת לב.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"במשך 9 השנים האחרונות, הסביבה המקצועית לא נתנה לכם את זה.<br><br>20 חלונות פתוחים, כל אחד דורש משהו אחר - זה 20 חיתוכים של תשומת הלב.<br><br>והמוח שלנו לא יכול לנדוד - לא יכול להיות ב-DMN - כשהוא מנהל 20 דברים במקביל."<br><br><em>פאוזה.</em><br><br>"הילדה לא יכלה לשחק כי היה לה כל היום פגישות.<br><br>הגוף לא יכול היה לקרוא את היוזר כי הוא היה עסוק בלעבור בין Jira, Figma, Slack, ו-ChatGPT.<br><br>זה לא שהם נעלמו. הם פשוט לא קיבלו מקום לעבוד."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״הסביבה המקצועית, לעניות דעתי, עד לא מזמן הפריעה לחוזקות האלה.<br><br>20 חלונות פתוחים, כל אחד דורש משהו אחר —<br><br>זה 20 חיתוכים של תשומת הלב.<br><br>והמוח שלנו לא יכול לנדוד — לא יכול להיות ב-DMN —<br><br>כשהוא מנהל 20 דברים במקביל.״<br><br><em>פאוזה.</em><br><br>״אצלי העקרונות הקודמים פשוט לא קיבלו מספיק מקום לעבוד.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 42 - Until now -->
@@ -2072,7 +2185,7 @@ body.blacked-out::after {
     <div style="font-family:var(--font-display);font-size:clamp(4rem,14vw,12rem);font-weight:900;line-height:0.9;letter-spacing:-0.03em;color:#fff;">עד עכשיו<span style="color:var(--coral);">.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"עד עכשיו.<br><br>כי עכשיו - אני יכולה להחזיק את כל העבודה שלי במקום אחד.<br><br>כלי אחד. מחובר להכל.<br><br>מערכת ההפעלה שלי."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״עד עכשיו.<br><br>כי עכשיו —<br><br>אני יכולה להחזיק את כל העבודה שלי במקום אחד.<br><br>כלי אחד. מחובר להכל.<br><br>מערכת ההפעלה שלי.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 43 - One tool -->
@@ -2109,7 +2222,7 @@ body.blacked-out::after {
     </div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"איך עושים את זה בפועל?<br><br>קודם כל - צריך לבחור כלי.<br><br>אני משתמשת ב-Cursor. יש גם Claude Code. יש כלים חדשים שיוצאים כל חודש.<br><br>לא משנה מה תבחרו - העיקרון זהה.<br><br>תבחרו כלי AI אחד שיכול להתחבר לדברים."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״איך עושים את זה בפועל?<br><br>קודם כל — צריך לבחור כלי.<br><br>אני משתמשת ב-Cursor.<br><br>יש גם Claude Code. יש כלים חדשים שיוצאים כל חודש.<br><br>לא משנה מה תבחרו — העיקרון זהה.<br><br>תבחרו כלי AI אחד שיכול להתחבר לדברים.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- NEW - Choose your tool -->
@@ -2124,7 +2237,7 @@ body.blacked-out::after {
     <div class="t-body muted center" style="max-width:560px;">לא משנה מה תבחרו - <span class="coral" style="font-weight:700;">העיקרון זהה.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"ואז - תבנו ממנו מערכת הפעלה.<br><br>איך? נתתי ל-AI שלי שלושה דברים."<br><br><em>פאוזה קצרה.</em></aside>
+  <aside class="notes">״ואז — תבנו ממנו מערכת הפעלה.<br><br>איך?<br><br>נתתי ל-AI שלי שלושה דברים.״<br><br><em>פאוזה קצרה.</em></aside>
 </section>
 
 <!-- NEW - Eyes: OS capability -->
@@ -2136,7 +2249,7 @@ body.blacked-out::after {
     <div class="t-body" style="max-width:640px;margin-top:8px;"><span class="coral" style="font-weight:700;">מהסרטון:</span> <span style="opacity:0.6;">הרגע שהאייג׳נטים גלשו אצל מתחרים.</span></div>
   </div>
 
-  <aside class="notes">"עיניים.<br><br>הוא רואה מה שאני רואה.<br><br>הוא יכול לפתוח דפדפן, להיכנס לאתר של מתחרה, לצלם מסכים, לגלול בפלואוים.<br><br>זה מה שראיתם בסרטון - כשהאייג'נטים גלשו אצל מתחרים והדביקו פלואוים שלמים לבורד שלי בפיגמה."</aside>
+  <aside class="notes">״עיניים.<br><br>הוא רואה מה שאני רואה.<br><br>הוא יכול לפתוח דפדפן, להיכנס לאתר של מתחרה, לצלם מסכים, לגלול בפלואוים.<br><br>זה מה שראיתם בסרטון — כשהאייג'נטים גלשו אצל מתחרים והדביקו את המחקר שלהם אצלי בבורד.״<br><br><em>פאוזה קצרה.</em></aside>
 </section>
 
 <!-- NEW - Memory: OS capability -->
@@ -2151,7 +2264,7 @@ body.blacked-out::after {
     <div class="t-body" style="max-width:640px;margin-top:8px;"><span class="coral" style="font-weight:700;">מהסרטון:</span> <span style="opacity:0.6;">ציור ביד הפך לעיצוב לפי הדיזיין סיסטם - כי הוא זוכר.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה קצרה.</em><br><br>"זיכרון.<br><br>הוא יודע מה שאני יודעת.<br><br>מי המשתמשים שלנו. מה המוצר. מה מערכת העיצוב. מה מיקוד הספרינט.<br><br>ולא רק ממה שכתבתי לו - הוא גם מחובר לפיגמה שלי. לג'ירה. למיקספאנל.<br><br>פיגמה. ג'ירה. סלאק. קלנדר. מיקספאנל. נושן.<br><br>כל אחד מהם - ערוץ זיכרון ב-OS.<br><br>בגלל זה כשהעליתי ציור ביד - הוא ידע להפוך אותו לעיצוב לפי הדיזיין סיסטם שלנו.<br><br>לא כי הוא קסם. כי הוא זוכר."</aside>
+  <aside class="notes">״זיכרון.<br><br>הוא יודע מה שאני יודעת.<br><br>מי המשתמשים שלנו. מה המוצר. מה מערכת העיצוב. מה מיקוד הספרינט.<br><br>ולא רק ממה שכתבתי לו —<br><br>הוא גם מחובר לפיגמה שלי. לג'ירה. למיקספאנל.<br><br>פיגמה. ג'ירה. סלאק. קלנדר. מיקספאנל. נושן.<br><br>כל אחד מהם — ערוץ זיכרון במערכת ההפעלה שלי.<br><br>בגלל זה כשהעליתי ציור ביד — הוא ידע להפוך אותו לעיצוב לפי הדיזיין סיסטם של האפליקציה.<br><br>לא כי הוא קסם. כי הוא זוכר.״<br><br><em>פאוזה קצרה.</em></aside>
 </section>
 
 <!-- NEW - Hands: OS capability -->
@@ -2163,7 +2276,7 @@ body.blacked-out::after {
     <div class="t-body" style="max-width:640px;margin-top:8px;"><span class="coral" style="font-weight:700;">מהסרטון:</span> <span style="opacity:0.6;">בניתי משחק Sims כדי להציג מידע.</span></div>
   </div>
 
-  <aside class="notes"><em>פאוזה קצרה.</em><br><br>"ידיים.<br><br>הוא בונה. לא רק מייעץ.<br><br>הוא כותב קוד. מריץ אפליקציות. יוצר פרוטוטייפים.<br><br>ולא - אתם לא צריכים להפוך למפתחים.<br><br>AI מבצע פעולות עבורכם. אתם מכוונים.<br><br>בגלל זה יכולתי לבנות משחק Sims ביום אחד."</aside>
+  <aside class="notes">״ידיים.<br><br>הוא בונה. לא רק מייעץ.<br><br>הוא כותב קוד. מריץ אפליקציות. יוצר פרוטוטייפים.<br><br>ולא — אתם לא צריכים להפוך למפתחים.<br><br>הקוד הוא המדיום. ה-AI כותב אותו. אתם מכוונים.<br><br>בגלל זה יכולתי לבנות משחק Sims ביום אחד.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 44 - Agents -->
@@ -2174,69 +2287,27 @@ body.blacked-out::after {
     <div class="chat-bubble" style="background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.06);">״תייצר לי מהעיצוב הזה פיצ׳ר באפליקציה.״</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"ואז - ה-OS עובד.<br><br>ולא רק שהוא מייצר שקט - הוא מריץ דברים ברקע. כמו מערכת הפעלה אמיתית.<br><br>אייג'נטים.<br><br>'תעבדי עליי אונבורדינג של 5 מתחרים.' - רץ ברקע.<br><br>'תסכמי לי את הראיונות.' - רץ ברקע.<br><br>'תייצרי לי אנימציה של הפלואו הזה.' - רץ ברקע."</aside>
+  <aside class="notes">״ואז אפשר לומר לו לעשות<br><br>'תעבדי עליי אונבורדינג של 5 מתחרים.' — רץ ברקע.<br><br>'תסכמי לי את הראיונות.' — רץ ברקע.<br><br>'תייצרי לי אנימציה של הפלואו הזה.' — רץ ברקע.״</aside>
 </section>
 
 <!-- 45 - Runs in background -->
 <section class="slide" data-world="light-cool" id="s45">
-  <div class="slide-inner slide-content full-center">
+  <div class="slide-inner slide-content full-center gap-md">
     <div class="t-huge"><span class="strike">יום עבודה</span> <span style="font-size:0.7em;vertical-align:middle;">←</span> <span class="coral">רץ ברקע.</span></div>
-  </div>
-
-  <aside class="notes">"פעם זה היה יום עבודה.<br><br>עכשיו הם מייצרים ברקע - ואני יוצרת על A4."</aside>
-</section>
-
-<!-- NEW - Practical tip: behavioral -->
-<section class="slide" data-world="dark" id="s45b">
-  <div class="slide-inner slide-content full-center">
-    <div class="recipe-card">
-      <div class="section-badge">טיפ פרקטי</div>
-      <div class="t-large" style="margin-bottom:32px;color:#fff;">כלי אחד. חברו הכל. ותכנסו לפלואו.</div>
-      <ol class="fragment-list stagger" style="max-width:700px;">
-        <li><span class="num">1</span>בחרו כלי אחד בלבד.</li>
-        <li><span class="num">2</span>חברו אליו עיניים, זיכרון, וידיים.</li>
-        <li><span class="num">3</span>תנו לו לעבוד - <strong>בזמן שאתם יוצרים.</strong></li>
-      </ol>
-    </div>
-  </div>
-  <div class="qr-placeholder">QR</div>
-
-  <aside class="notes"><em>פאוזה.</em><br><br>"הטיפ הפרקטי:<br><br>בחרו כלי אחד. כלי אחד בלבד.<br><br>חברו אליו את כל מה שאתם עובדים איתו.<br><br>תנו לו עיניים, זיכרון, וידיים.<br><br>ותנו לו לעבוד - בזמן שאתם יוצרים.<br><br>כל הפרטים של איך לעשות את זה בפועל - ב-QR code בסוף."</aside>
-</section>
-
-<!-- ═══════════════════════════════════════════ -->
-<!-- STATION 5 - THE VIDEO RETURNS -->
-<!-- ═══════════════════════════════════════════ -->
-
-<!-- 48 - Video BG -->
-<section class="slide" data-world="void" id="s48">
-  <div class="slide-inner slide-content anim-fade full-center">
-    <div style="width:100%;max-width:760px;border-radius:18px;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.04);background:#000;">
-      <video style="width:100%;display:block;" autoplay loop muted playsinline>
-        <source src="videos/Demo video - no sound.mp4" type="video/mp4">
-      </video>
+    <div style="position:relative;max-width:480px;">
+      <div style="border-radius:14px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.10);border:1px solid rgba(0,0,0,0.06);">
+        <video autoplay muted loop playsinline style="width:100%;display:block;">
+          <source src="videos/Lightning demos-screen-studio.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;white-space:nowrap;">
+        <span style="background:#fff;color:#2a2a2a;font-size:0.82rem;font-weight:700;padding:7px 20px;border-radius:100px;letter-spacing:0.02em;box-shadow:0 2px 12px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.06);">האייג׳נטים שלי עושים את כל זה בלעדיי</span>
+        <span style="background:var(--coral);color:#fff;font-size:0.72rem;font-weight:800;padding:5px 14px;border-radius:100px;letter-spacing:0.06em;text-transform:uppercase;transform:rotate(-2deg);box-shadow:0 2px 8px rgba(255,107,53,0.3);">no hands</span>
+      </div>
     </div>
   </div>
 
-  <aside class="notes"><em>אנרגיה משתנה. נמוכה יותר, יותר אישית, כמעט לחישה.</em><br><br>"עכשיו - אני רוצה לבקש מכם משהו."<br><br><em>פאוזה.</em><br><br>"זוכרים את הסרטון בהתחלה?"<br><br><em>הסרטון חוזר לרוץ ברקע. בשקט. בלי סאונד.</em><br><br>"בהתחלה אמרתי לכם שאני הולכת להראות לכם את הכלים שעזרו לי.<br><br>זה היה חצי אמת.<br><br>באמת יש שם כלים. יש שם שיטות.<br><br>אבל מה שראיתם בסרטון ההוא - זה לא 7 יכולות טכנולוגיות."</aside>
-</section>
-
-<!-- 49 - Half hour of craft -->
-<section class="slide" data-world="dark" id="s49">
-  <div class="slide-inner slide-content pin-bottom-left">
-    <div class="t-huge">סשן של קראפט.</div>
-  </div>
-
-  <aside class="notes"><em>פאוזה.</em><br><br>"זה סשן של קראפט.<br><br>של יצירה.<br><br>הילדה שבי שיחקה בין השלבים - בדיוק כמו שבגיל 11 שיחקה בין HTML לצבעים.<br><br>הגוף שלי, האינטואיציה שלי על היוזר שלי - הם שהחליטו אילו שאלות לשאול ואיזה פתרון כדאי לבדוק.<br><br>ו-Cursor? הוא היה פשוט המקום שאפשר לכל זה לקרות."</aside>
-</section>
-
-<!-- 59 - New craft -->
-<section class="slide" data-world="light" id="s59">
-  <div class="slide-inner slide-content pin-left">
-    <div class="t-huge" style="max-width:700px;">הקראפט החדש.<br>אותה נשמה. <span class="coral">form אחר.</span></div>
-  </div>
-
-  <aside class="notes"><em>אנרגיה מתכנסת. חמה. מזמינה.</em><br><br>"אני מכוונת את הספינה.<br><br>אבל אם פעם הייתי נתקעת כי הייתי תלויה בכישורים של אחרים - היום גם כשאני נתקעת, זו הזדמנות ללמוד ולפתח כישור.<br><br>אם פעם משהו אופרטיבי היה שואב לי את רוב היום - היום האייג'נט שלי מתקתק את זה ברקע.<br><br>דרך העבודה שלי נהייתה היצירה עצמה. דרך העבודה, הספונטניות - החזיר את הילדה שבי. את האינטואיציה שלי. המשחקיות.<br><br>זה הקראפט החדש.<br><br>פשוט ב-form שאנחנו עוד לא רגילים אליו."</aside>
+  <aside class="notes">פעם זה היה יום עבודה.<br><br>עכשיו הם מייצרים ברקע — ואני יוצרת על A4.<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 51 - Idea to execution -->
@@ -2270,8 +2341,62 @@ body.blacked-out::after {
     </style>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"שם -"<br><br><em>מצביעה.</em><br><br>"אני מעבירה את הציור ל-Cursor.<br><br>והוא הופך אותו לעיצוב מלא, לפי מערכת העיצוב שלנו.<br><br>זה הרגע שהפער בין רעיון לביצוע נמחק.<br><br>פעם הציור הזה היה מת בדף.<br><br>היום - הוא הופך לעיצוב באותו היום."</aside>
+  <aside class="notes"><em>פאוזה. מצביעה על המסך.</em><br><br>״שימו לב לשלוש נקודות.<br><br>שם —״ <em>(מצביעה)</em><br><br>״אני יושבת עם A4 וטוש.<br><br>זה הרגע שבו הילדה שבי נכנסת לחדר.<br><br>לפני AI, בלי AI.<br><br>זה רגע של קנבס ריק שהוא לגמרי שלי.״<br><br><em>פאוזה.</em><br><br>״שם —״ <em>(מצביעה)</em><br><br>״אני מעבירה את הציור ל-Cursor.<br><br>והוא הופך אותו לעיצוב מלא, לפי מערכת העיצוב שלנו.<br><br>זה הרגע שהפער בין רעיון לביצוע נמחק.<br><br>פעם הציור הזה היה מת בדף.<br><br>היום — הוא הופך לעיצוב באותו היום.״<br><br><em>פאוזה.</em><br><br>״ושם —״ <em>(מצביעה)</em><br><br>״במקום פרזנטציה רגילה לסטייקהולדרים —<br><br>בניתי משחק בסגנון Sims שמדמה להם את חוויית המשתמשים שראיינתי.״<br><br><em>פאוזה. חיוך קטן.</em><br><br>״זה לא פרזנטציה.<br><br>זה משחק.<br><br>כי האינטואיציה שלי אמרה לי שאם אני רוצה שסטייקהולדרים באמת ירגישו את היוזר —<br><br>הם צריכים לשחק אותו, לא לראות סליידים.<br><br>וה-AI אפשר לי לבנות את זה באותו יום.״<br><br><em>פאוזה. עצמת הטיעון עולה.</em><br><br>״זה וייב קודינג.<br><br>אבל לא רק על הקוד. זה וייב ריסרצ, וייב עריכה של ספר, וייב יצירת הזמנות לחתונה שלי, וייב הכל.<br><br>זה וייב-עבודה.<br><br>ספונטני. רציף. משתנה. משחקי.<br><br>זו הפעם הראשונה ב-9 שנים שיכולתי לעבוד ככה.״<br><br><em>פאוזה ארוכה.</em></aside>
 </section>
+
+<!-- NEW - Practical tip: behavioral -->
+<section class="slide" data-world="dark" id="s45b">
+  <div class="slide-inner slide-content full-center">
+    <div class="recipe-card">
+      <div class="section-badge">טיפ פרקטי</div>
+      <div class="t-large" style="margin-bottom:32px;color:#fff;">כלי אחד. חברו הכל. ותכנסו לפלואו.</div>
+      <ol class="fragment-list stagger" style="max-width:700px;">
+        <li><span class="num">1</span>בחרו כלי אחד בלבד.</li>
+        <li><span class="num">2</span>חברו אליו עיניים, זיכרון, וידיים.</li>
+        <li><span class="num">3</span>תנו לו לעבוד — <strong>בזמן שאתם יוצרים.</strong></li>
+      </ol>
+    </div>
+  </div>
+  <div class="qr-placeholder">QR</div>
+
+  <aside class="notes">״הטיפ הפרקטי:<br><br>בחרו כלי אחד. כלי אחד בלבד.<br><br>חברו אליו את כל מה שאתם עובדים איתו.<br><br>תנו לו עיניים, זיכרון, וידיים.<br><br>ותנו לו לעבוד — בזמן שאתם יוצרים.<br><br>כל הפרטים של איך לעשות את זה בפועל — ב-QR code בסוף.״</aside>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STATION 5 - THE VIDEO RETURNS -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- 48 - Video BG -->
+<section class="slide" data-world="void" id="s48">
+  <div class="slide-inner slide-content anim-fade full-center">
+    <div style="width:100%;max-width:760px;border-radius:18px;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.04);background:#000;">
+      <video style="width:100%;display:block;" autoplay loop muted playsinline>
+        <source src="videos/Demo video - no sound.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <aside class="notes">״עכשיו —<br><br>אני רוצה לבקש מכם משהו.״<br><br><em>פאוזה.</em><br><br>״זוכרים את הסרטון בהתחלה?״<br><br><em>הסרטון חוזר לרוץ ברקע. בשקט. בלי סאונד.</em><br><br>״בהתחלה אמרתי לכם שאני הולכת להראות לכם את הכלים שעזרו לי.<br><br>באמת יש שם כלים. יש שם שיטות.<br><br>אבל מה שראיתם בסרטון ההוא —<br><br>זה לא רק 7 יכולות טכנולוגיות.״<br><br><em>פאוזה.</em></aside>
+</section>
+
+<!-- 49 - Half hour of craft -->
+<section class="slide" data-world="dark" id="s49">
+  <div class="slide-inner slide-content pin-bottom-left">
+    <div class="t-huge">סשן של קראפט.</div>
+  </div>
+
+  <aside class="notes">״זה סשן של קראפט.<br><br>של יצירה.<br><br>הילדה שבי שיחקה בין השלבים —<br><br>בדיוק כמו שבגיל 11 שיחקה בין HTML לצבעים.<br><br>הגוף שלי, האינטואיציה שלי על היוזר שלי —<br><br>הם שהחליטו אילו שאלות לשאול ואיזה פתרון כדאי לבדוק.<br><br>ו-Cursor?<br><br>הוא היה פשוט המקום שאפשר לכל זה לקרות.״</aside>
+</section>
+
+<!-- 59 - New craft -->
+<section class="slide" data-world="light" id="s59">
+  <div class="slide-inner slide-content pin-left">
+    <div class="t-huge" style="max-width:700px;">הקראפט החדש.<br>אותה נשמה. <span class="coral">form אחר.</span></div>
+  </div>
+
+  <aside class="notes"><em>אנרגיה מתכנסת. חמה. מזמינה.</em><br><br>״אני מכוונת את הספינה.<br><br>אבל אם פעם הייתי נתקעת כי הייתי תלויה בכישורים של אחרים —<br><br>היום גם כשאני נתקעת, זו הזדמנות ללמוד ולפתח כישור.<br><br>אם פעם משהו אופרטיבי היה שואב לי את רוב היום —<br><br>היום האייג'נט שלי מתקתק את זה ברקע.<br><br>דרך העבודה שלי נהייתה היצירה עצמה. דרך העבודה, הספונטניות — החזיר את הילדה שבי. את האינטואיציה שלי. המשחקיות.<br><br>זה הקראפט החדש.<br><br>פשוט ב-form שאנחנו עוד לא רגילים אליו.״<br><br><em>פאוזה.</em></aside>
+</section>
+
 
 
 <!-- ═══════════════════════════════════════════ -->
@@ -2287,7 +2412,7 @@ body.blacked-out::after {
     </div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"וזה לא מיינדסט חדש שצריך לאמץ בכוח.<br><br>זו הרשאה.<br><br>להיות ילדותיים בעבודה שלכם.<br><br>להיות משחקיים.<br><br>להיות בדיוק מי שאתם - כי דווקא זה הופך אתכם ל-designers הכי טובים שאתם יכולים להיות."</aside>
+  <aside class="notes"><em>פאוזה.</em><br><br>״וזה לא מיינדסט חדש שצריך לאמץ בכוח.<br><br>זו הרשאה.<br><br>להיות ילדותיים בעבודה שלכם.<br><br>להיות משחקיים.<br><br>להיות בדיוק מי שאתם —<br><br>כי דווקא זה הופך אתכם ל-designers הכי טובים שאתם יכולים להיות.״<br><br><em>פאוזה.</em></aside>
 </section>
 
 <!-- 62 - Engine & heart (poster) -->
@@ -2297,7 +2422,7 @@ body.blacked-out::after {
     <div class="t-hand coral" style="font-size:clamp(5rem,18vw,15rem);line-height:0.85;margin-top:-8px;">אתם הלב.</div>
   </div>
 
-  <aside class="notes"><em>פאוזה.</em><br><br>"הגוף שלכם, הילד שבכם, ההבנה שלכם את היוזר - הם לא חולשה בעידן של AI.<br><br>הם הסחורה היקרה ביותר בשוק.<br><br>ו-AI, בצורה הנכונה - בדיוק מה שמאפשר לכם להביא אותם לעבודה.<br><br>כל יום. במלוא העוצמה."<br><br><em>פאוזה. הרגע האחרון הרגשי.</em><br><br>"בסוף - ה-AI הוא רק המנוע.<br><br>אבל אתם - אתם הלב של היצירה הזאת."<br><br><em>פאוזה ארוכה.</em></aside>
+  <aside class="notes">״הגוף שלכם, הילדה שבכם, ההבנה שלכם את היוזר —<br><br>הם לא חולשה בעידן של AI.<br><br>הם הסחורה היקרה ביותר בשוק.<br><br>ו-AI, בצורה הנכונה —<br><br>בדיוק מה שמאפשר לכם להביא אותם לעבודה.<br><br>כל יום.<br><br>במלוא העוצמה.״<br><br><em>פאוזה. הרגע האחרון הרגשי.</em><br><br>״בסוף —<br><br>ה-AI הוא רק המנוע.<br><br>אבל אתם —<br><br>אתם הלב של היצירה הזאת.״<br><br><em>פאוזה ארוכה.</em></aside>
 </section>
 
 <!-- 63 - CTA + QR -->
@@ -2331,7 +2456,7 @@ body.blacked-out::after {
 
   </div>
 
-  <aside class="notes"><em>אנרגיה מתרככת. מעבר ל-call to action.</em><br><br>"ניסיתי לתת לכם חכה, לא דג.<br><br>אבל דגים זה טעים. וזו דרך טובה להתחיל.<br><br>העלתי היום 10 טיפים פרקטיים לעבודה עם אייג'נטים.<br><br>גם אם אתם עובדים עם אייג'נטים הרבה, וגם אם המילה 'אייג'נט' לא אומרת לכם כלום - יש שם hacks רלוונטיים.<br><br>ובשבועות הקרובים אעלה מדריכים לכל השלבים שראיתם כאן.<br><br>ומשאבים של מה שאני השתמשתי בו - במתנה."<br><br><em>QR code עולה על המסך.</em></aside>
+  <aside class="notes"><em>אנרגיה מתרככת. מעבר ל-call to action.</em><br><br>״ניסיתי לתת לכם חכה, לא דג.<br><br>אבל דגים זה טעים. וזו דרך טובה להתחיל.<br><br>אז רק לאורחי הכנס — תקבלו מתנה ממני, 10 טיפים כדי לעשות מה שראיתם בסרטון.<br><br>גם אם אתם עובדים עם אייג'נטים הרבה,<br><br>וגם אם המילה 'אייג'נט' לא אומרת לכם כלום —<br><br>יש שם hacks רלוונטיים.<br><br>ובשבועות הקרובים אעלה מדריכים לכל השלבים שראיתם כאן.<br><br>ומשאבים של מה שאני השתמשתי בו — במתנה.״<br><br><em>QR code עולה על המסך.</em><br><br>״מצרפת לכם QR code —<br><br>כדי שתתחילו<br><br>ליצור.<br><br>לא רק לייצר.<br><br>כבר מחר בבוקר.״</aside>
 </section>
 
 
@@ -2343,11 +2468,22 @@ const navHint = document.getElementById('navHint');
 const presenterPanel = document.getElementById('presenterPanel');
 const noteContent = document.getElementById('noteContent');
 const noteSlideNum = document.getElementById('noteSlideNum');
+const pcNotes = document.getElementById('pcNotes');
+const pcSlideInfo = document.getElementById('pcSlideInfo');
+const pcNextInfo = document.getElementById('pcNextInfo');
+const pcFooterSlide = document.getElementById('pcFooterSlide');
+const pcTimerEl = document.getElementById('pcTimer');
+const pcClockEl = document.getElementById('pcClock');
 
 let currentSlide = 0;
 let hintHidden = false;
 let notesOpen = false;
 let isTransitioning = false;
+let timerStart = null;
+let timerInterval = null;
+let clockInterval = null;
+let isSyncNavigation = false;
+let channel = null;
 
 const TRANSITION_MS = 900;
 
@@ -2363,8 +2499,76 @@ if (!presenterMode) {
   document.querySelector('.progress').style.display = 'none';
 }
 
+const isAudience = params.get('audience') === 'true';
+const isConsole = params.get('console') === 'true';
+
+if (isAudience) {
+  document.body.classList.add('audience-mode');
+}
+
+if (isConsole) {
+  document.body.classList.add('console-mode');
+}
+
+try {
+  channel = new BroadcastChannel('deck-sync');
+  channel.onmessage = (e) => {
+    if (e.data.type === 'goto') {
+      isSyncNavigation = true;
+      goToSlide(e.data.slide);
+      isSyncNavigation = false;
+    } else if (e.data.type === 'init') {
+      channel.postMessage({ type: 'goto', slide: currentSlide });
+    }
+  };
+} catch(err) {}
+
 function isLightWorld(w) { return w && (w.startsWith('light') || w === 'coral' || w === 'shift'); }
 function isDarkWorld(w) { return w === 'dark' || w === 'void'; }
+
+function updatePresenterConsole() {
+  if (!isConsole) return;
+  const cur = slides[currentSlide];
+  const total = slides.length;
+
+  pcSlideInfo.textContent = (currentSlide + 1) + ' / ' + total;
+  pcFooterSlide.textContent = cur.id || ('Slide ' + (currentSlide + 1));
+
+  const nextIdx = currentSlide + 1;
+  if (nextIdx < total) {
+    pcNextInfo.textContent = 'הבא: ' + (slides[nextIdx].id || ('Slide ' + (nextIdx + 1)));
+  } else {
+    pcNextInfo.textContent = 'סלייד אחרון';
+  }
+
+  const notesEl = cur.querySelector('.notes');
+  pcNotes.innerHTML = notesEl ? notesEl.innerHTML : '<em style="opacity:0.4;">אין הערות</em>';
+  pcNotes.scrollTop = 0;
+}
+
+function updateTimerDisplay() {
+  if (!timerStart || !pcTimerEl) return;
+  const elapsed = Date.now() - timerStart;
+  const h = Math.floor(elapsed / 3600000);
+  const m = Math.floor((elapsed % 3600000) / 60000);
+  const s = Math.floor((elapsed % 60000) / 1000);
+  pcTimerEl.textContent =
+    String(h).padStart(2, '0') + ':' +
+    String(m).padStart(2, '0') + ':' +
+    String(s).padStart(2, '0');
+}
+
+function updateClockDisplay() {
+  if (!pcClockEl) return;
+  pcClockEl.textContent = new Date().toLocaleTimeString('he-IL', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+}
+
+function openConsoleWindow() {
+  const url = window.location.pathname + '?console=true&start=' + currentSlide;
+  window.open(url, 'deck-console');
+}
 
 function pickTransition(fromIdx, toIdx) {
   const from = slides[fromIdx];
@@ -2405,45 +2609,19 @@ function cleanAnim(el) {
 }
 
 function goToSlide(index) {
-  if (index < 0 || index >= slides.length || index === currentSlide || isTransitioning) return;
-  isTransitioning = true;
-
-  const fwd = index > currentSlide;
-  let transition = pickTransition(currentSlide, index);
-
-  if (!fwd && transition === 'slide-up') transition = 'slide-down';
-  if (!fwd && transition === 'wipe') transition = 'wipe-rev';
+  if (index < 0 || index >= slides.length || index === currentSlide) return;
+  if (channel && !isSyncNavigation) channel.postMessage({ type: 'goto', slide: index });
 
   const leaving = slides[currentSlide];
   const entering = slides[index];
 
-  cleanAnim(leaving);
-  cleanAnim(entering);
-
-  leaving.classList.remove('visible');
-  leaving.classList.add('leave-' + transition);
-
-  entering.classList.add('enter-' + transition);
+  leaving.classList.remove('active', 'visible');
+  entering.classList.add('active', 'visible');
 
   currentSlide = index;
   updateUI();
 
-  const world = entering.dataset.world;
-  document.body.style.backgroundColor = WORLD_BG[world] || '#0a0908';
-
-  setTimeout(() => {
-    entering.classList.add('visible');
-  }, 250);
-
-  setTimeout(() => {
-    leaving.classList.remove('active');
-    cleanAnim(leaving);
-
-    entering.classList.add('active');
-    cleanAnim(entering);
-
-    isTransitioning = false;
-  }, TRANSITION_MS);
+  document.body.style.backgroundColor = WORLD_BG[entering.dataset.world] || '#0a0908';
 }
 
 document.addEventListener('click', () => { document.body.focus(); });
@@ -2464,9 +2642,11 @@ function updateUI() {
   noteContent.innerHTML = notesEl ? notesEl.innerHTML : '<em>אין הערות לסלייד הזה</em>';
   noteSlideNum.textContent = slides[currentSlide].id || ('slide ' + (currentSlide + 1));
 
-  if (slides[currentSlide].id) {
+  if (slides[currentSlide].id && !isAudience) {
     history.replaceState(null, '', '#' + slides[currentSlide].id);
   }
+
+  updatePresenterConsole();
 }
 
 const NEXT_KEYS = new Set(['ArrowDown', ' ', 'PageDown', 'ArrowRight', 'Enter']);
@@ -2492,17 +2672,22 @@ document.addEventListener('keydown', (e) => {
   } else if (e.key === 'F5') {
     e.preventDefault();
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-  } else if (e.key === 'f' || e.key === 'F') {
+  } else if (e.code === 'KeyF') {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
-  } else if (e.key === 'b' || e.key === 'B' || e.key === '.') {
+  } else if (e.code === 'KeyB' || e.key === '.') {
     e.preventDefault();
     document.body.classList.toggle('blacked-out');
-  } else if (e.key === 'n' || e.key === 'N') {
+  } else if (e.code === 'KeyN') {
     e.preventDefault();
-    notesOpen = !notesOpen;
-    presenterPanel.classList.toggle('open', notesOpen);
-    document.body.classList.toggle('presenter-mode', notesOpen);
+    if (!isConsole) {
+      notesOpen = !notesOpen;
+      presenterPanel.classList.toggle('open', notesOpen);
+      document.body.classList.toggle('presenter-mode', notesOpen);
+    }
+  } else if (e.code === 'KeyP') {
+    e.preventDefault();
+    if (!isAudience && !isConsole) openConsoleWindow();
   }
 
   if (!hintHidden) {
@@ -2544,12 +2729,17 @@ document.addEventListener('touchend', (e) => {
 
 function initSlides() {
   let startIdx = 0;
-  const hash = window.location.hash;
-  if (hash) {
-    const target = document.querySelector(hash);
-    if (target) {
-      const idx = Array.from(slides).indexOf(target);
-      if (idx >= 0) startIdx = idx;
+  const startParam = parseInt(params.get('start'));
+  if (!isNaN(startParam) && startParam >= 0 && startParam < slides.length) {
+    startIdx = startParam;
+  } else {
+    const hash = window.location.hash;
+    if (hash) {
+      const target = document.querySelector(hash);
+      if (target) {
+        const idx = Array.from(slides).indexOf(target);
+        if (idx >= 0) startIdx = idx;
+      }
     }
   }
 
@@ -2562,6 +2752,18 @@ function initSlides() {
   currentSlide = startIdx;
   document.body.style.backgroundColor = WORLD_BG[slides[startIdx].dataset.world] || '#0a0908';
   updateUI();
+
+  if (isConsole) {
+    timerStart = Date.now();
+    timerInterval = setInterval(updateTimerDisplay, 1000);
+    clockInterval = setInterval(updateClockDisplay, 1000);
+    updateTimerDisplay();
+    updateClockDisplay();
+    updatePresenterConsole();
+    if (channel) channel.postMessage({ type: 'init' });
+  } else if (isAudience && channel) {
+    channel.postMessage({ type: 'init' });
+  }
 }
 
 initSlides();
